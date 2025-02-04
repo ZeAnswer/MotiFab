@@ -4,19 +4,27 @@ MotiFab: Motif Fabricator CLI Tool
 
 MotiFab is an artificial data generator designed to produce benchmark datasets for motif 
 enrichment tools (e.g., MEME, HOMER). For now, the tool processes a FASTA file containing source 
-sequences. In future versions, additional input types (e.g., BED and genome files, along with 
-whitelist/blacklist support) will be available.
+sequences and generates two output FASTA files:
+  - A search set (test set) with motif injections.
+  - A background set, generated either by selecting non-test sequences or by shuffling the test set.
 
-Key workflow steps (to be integrated later) include:
-  1. Selecting a "search set" (target sequences) and a "background set" from the FASTA.
-  2. Generating or retrieving a motif (via random generation, a provided motif string, or via a motif file).
-  3. Injecting the motif into a subset of the search set (either as an absolute number or a percentage).
-  4. Optionally generating background sequences via shuffling.
-  
-This CLI currently sets up parameter input; later, these parameters will be tied to the complete data-generation workflow.
+Workflow:
+  1. Load the input FASTA file.
+  2. Select a search set of the specified size.
+  3. Generate a background set according to the chosen mode.
+  4. Generate a motif (from a provided string, random length, or PWM file).
+  5. Determine the injection count (absolute or percentage).
+  6. Inject the motif into the chosen search set sequences.
+  7. Write the search and background sets to output FASTA files.
 """
 
 import argparse
+import random
+import sys
+
+from src.fasta_utils import load_fasta, write_fasta, select_random_sequences
+from src.motif import Motif
+from src.shuffle import shuffle_sequence
 
 def main():
     parser = argparse.ArgumentParser(
