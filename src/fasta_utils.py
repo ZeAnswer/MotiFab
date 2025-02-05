@@ -149,3 +149,5 @@ def generate_random_fasta_file(output_path: str,
     """
     records = generate_random_fasta_records(num_sequences, min_length, max_length, prefix)
     write_fasta(records, output_path)
+    
+generate_random_fasta_file("random.fasta", num_sequences=300, min_length=50, max_length=100, prefix="seq")

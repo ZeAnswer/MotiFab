@@ -16,6 +16,8 @@ Workflow:
   5. Determine the injection count (absolute or percentage).
   6. Inject the motif into the chosen search set sequences.
   7. Write the search and background sets to output FASTA files.
+  
+  A new flag, --dry-run, is added so that in testing the CLI only parses and prints the parameters.
 """
 
 import argparse
@@ -25,6 +27,7 @@ import sys
 from src.fasta_utils import load_fasta, write_fasta, select_random_sequences
 from src.motif import Motif
 from src.shuffle import shuffle_sequence
+from src.sequence_injector import inject_motif_into_records
 
 def main():
     parser = argparse.ArgumentParser(
@@ -105,6 +108,13 @@ def main():
         help="Output file for the background sequences (default: background_set.fasta)."
     )
 
+    # New flag for dry-run mode: if set, the CLI stops after parsing and printing arguments.
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="If set, perform a dry run (only parse and print arguments; no file I/O)."
+    ) 
+
     args = parser.parse_args()
 
     # Debug print: Display all parsed arguments for verification.
@@ -112,33 +122,73 @@ def main():
     for arg, value in vars(args).items():
         print(f"  {arg}: {value}")
 
-    # ----------------------------------------------------------------------------
-    # Placeholder for the complete data generation workflow.
-    #
-    # Future integration will include:
-    #   1. Loading the FASTA file to retrieve source sequences.
-    #   2. Selecting a search set and a background set based on:
-    #          - The specified search size.
-    #          - The chosen background generation mode ('select' or 'shuffle').
-    #   3. Generating or retrieving the motif using one of:
-    #          - Random generation (--motif-length)
-    #          - A provided motif string (--motif-string)
-    #          - A motif file (--motif-file)
-    #   4. Injecting the motif into the search set:
-    #          - The injection rate will be interpreted as an absolute count or percentage.
-    #   5. Optionally shuffling sequences (if background mode is "shuffle") using the specified method.
-    #   6. Writing the final search and background datasets to the designated output files.
-    #
-    # Each step will eventually invoke functions from modules such as:
-    #   - fasta_utils.py (for file I/O and sequence selection)
-    #   - motif.py (for motif generation/parsing)
-    #   - shuffle.py (for sequence shuffling)
-    #   - The resolver framework (for modular data processing)
-    #
-    # For now, this CLI confirms that all parameters have been parsed correctly.
-    # ----------------------------------------------------------------------------
+    # If dry-run is set, exit without performing any further actions.
+    if args.dry_run:
+        print("Dry run mode: no further action performed.")
+        sys.exit(0) 
 
-    print("\nMotiFab initialized. Data generation steps will be integrated in future development.")
+    # Step 1: Load the input FASTA file.
+    try:
+        records = load_fasta(args.fasta)
+    except Exception as e:
+        sys.exit(f"Error loading FASTA file: {e}")
+
+    if args.search_size > len(records):
+        sys.exit("Error: search-size exceeds the number of sequences in the input FASTA file.")
+
+    # Step 2: Select the search set.
+    search_set = select_random_sequences(records, args.search_size)
+
+    # Step 3: Generate the background set.
+    if args.background_mode == "select":
+        search_ids = {rec["id"] for rec in search_set}
+        background_candidates = [rec for rec in records if rec["id"] not in search_ids]
+        if len(background_candidates) < args.background_size:
+            background_set = background_candidates
+        else:
+            background_set = select_random_sequences(background_candidates, args.background_size)
+    elif args.background_mode == "shuffle":
+        # Generate background set by shuffling each record in the search set repeatedly until
+        # we have enough background sequences.
+        background_set = []
+        bg_counter = 1  # Initialize a counter for unique background IDs.
+        while len(background_set) < args.background_size:
+            for rec in search_set:
+                new_rec = rec.copy()
+                new_rec["seq"] = shuffle_sequence(rec["seq"], method=args.shuffle_method)
+                # Append a unique suffix to both the id and description.
+                new_rec["id"] = f"{new_rec['id']}_bg{bg_counter}"
+                new_rec["desc"] = f"{new_rec['desc']}_bg{bg_counter}"
+                bg_counter += 1
+                background_set.append(new_rec)
+                if len(background_set) >= args.background_size:
+                    break
+    else:
+        sys.exit("Unknown background mode.")
+
+    # Step 4: Generate the motif.
+    if args.motif_string:
+        motif_obj = Motif(args.motif_string, input_type="string")
+    elif args.motif_length is not None:
+        motif_obj = Motif(args.motif_length, input_type="length")
+    elif args.motif_file:
+        motif_obj = Motif(args.motif_file, input_type="file")
+    else:
+        sys.exit("No motif option provided.")
+    motif_value = motif_obj.get_motif()
+
+    # Step 5: Inject the motif into the search set (using the sequence_injector module).
+    injected_search_set = inject_motif_into_records(search_set, motif_value, args.injection_rate)
+
+    # Step 6: Write the output FASTA files.
+    try:
+        write_fasta(injected_search_set, args.output_search)
+        write_fasta(background_set, args.output_background)
+    except Exception as e:
+        sys.exit(f"Error writing output files: {e}")
+
+    print("Search set (test set) written to:", args.output_search)
+    print("Background set written to:", args.output_background)
 
 if __name__ == "__main__":
     main()
