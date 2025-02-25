@@ -1,20 +1,13 @@
 import copy
-import re
+from flowline import FlowPipe
 
-def merge_data(existing, new):
+def merge_data(existing, new, mapping=None):
     """
-    Merge two dictionaries. If the same key exists in both, then the value is merged into a list.
-    (This simple merge can be adjusted depending on the expected downstream semantics.)
+    Merge two dictionaries. If the same key exists in both, then the value is overwritten.
     """
-    for k, v in new.items():
-        if k in existing:
-            # If not already a list, convert
-            if not isinstance(existing[k], list):
-                existing[k] = [existing[k]]
-            existing[k].append(v)
-        else:
-            existing[k] = v
-    return existing
+    for key, value in new.items():
+        mapped_key = mapping[key] if mapping and key in mapping else key
+        existing[mapped_key] = value
 
 
 class FlowManager:
@@ -44,10 +37,10 @@ class FlowManager:
         # Add the starting node to the manager.
         self._enqueue(start_node)
     
-    def _enqueue(self, node):
+    def _enqueue(self, node:FlowPipe):
         """Add a node to the queue and initialize its accumulated data if not already present."""
         if node not in self.accumulated:
-            self.accumulated[node] = {}  # start with an empty dict
+            self.accumulated[node] = node.get_external_inputs  # start with an empty dict
             self.queue.append(node)
     
     def run(self, initial_data):
@@ -99,7 +92,7 @@ class FlowManager:
                                 self.accumulated[down_node] = {}
                                 self.queue.append(down_node)
                             # Merge the current node's output into the downstream's accumulator.
-                            merge_data(self.accumulated[down_node], node_output)
+                            merge_data(self.accumulated[down_node], node_output, node.get_output_mapping_of(down_node))
                     else:
                         # No downstream nodes; treat its output as final.
                         merge_data(self.final_outputs, node_output)
@@ -167,6 +160,7 @@ class FlowManager:
             simulated_inputs[start_node][req] = [f"ext_{req}"]
 
         # For every other node, accumulate outputs from its upstream nodes.
+        # If a required input is not provided by any upstream node, we will also check for the nodes external_inputs (defaults).
         # Here we assume that the upstream node's outputs are given by node.get_outputs() (a list of names).
         for node in visited:
             if node is start_node:
@@ -184,8 +178,10 @@ class FlowManager:
                                 "Consider using an output filter to resolve this."
                             )
                         acc[out_name] = up  # store the upstream node reference (for error messaging)
+            # Add the external inputs (defaults) if not already provided.
             # Save the simulated inputs for this node as a dict mapping input name -> list (of length 1 if present)
             # For our simulation we need to ensure that every required input is provided.
+            merge_data(acc, node.get_external_inputs())
             for req in node.get_inputs():
                 if req not in acc:
                     raise RuntimeError(f"Node {node} requires input '{req}' which is not provided by any upstream node.")

@@ -2,9 +2,7 @@ import pytest
 import sys
 import os
 import re
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")))
-from flowline.flow_manager import FlowManager
-from flowline.flow_pipe import FlowPipe, FlowOutputFilter
+from flowline import FlowPipe, FlowOutputFilter, FlowManager
 
 # --- Helper functions to create FlowPipe instances with specific actions ---
 
@@ -173,4 +171,5 @@ def test_parallel_execution():
     assert result == {"B": 3, "C": 8}  # 2 + 1, 2 * 4
 
 
-# Additional tests can be added as needed.
+# TODO added external inputs, need to test those as well
+# TODO added output mappings, need to test those as well
