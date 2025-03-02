@@ -1,9 +1,10 @@
-from .flow_base.flow_pipe import FlowOutputFilter, FlowPipe, FlowOutputRenamer
+from .flow_base.flow_pipe import FlowOutputFilter, FlowPipe, FlowOutputRenamer, FlowSource
 from .flow_base.flow_manager import FlowManager
 from .flow_pipes.fasta_pipes import LoadFastaPipe, WriteFastaPipe, SelectRandomFastaSequencesPipe
-from .flow_pipes.motif_pipes import SampleMotifsFromPWMPipe, ValidateMotifStringPipe, GenerateRandomMotifsPipe, ParsePWMPipe
+from .flow_pipes.motif_pipes import SampleMotifsFromPWMPipe, ProcessProvidedMotifPipe, GenerateRandomMotifsPipe, ParsePWMPipe
 from .flow_pipes.shuffle_pipes import NaiveShufflePipe, DiPairShufflePipe
 from .flow_pipes.injection_pipes import InjectMotifsIntoFastaRecordsPipe
+from .flow_pipes.utility_pipes import UnitAmountConverterPipe
 
 __all__ = [
     # Base classes
@@ -11,6 +12,7 @@ __all__ = [
     "FlowPipe", 
     "FlowOutputFilter", 
     "FlowOutputRenamer", 
+    "FlowSource",
     
     # Fasta pipes
     "LoadFastaPipe", 
@@ -19,7 +21,7 @@ __all__ = [
     
     # Motif pipes
     "SampleMotifsFromPWMPipe",
-    "ValidateMotifStringPipe",
+    "ProcessProvidedMotifPipe",
     "GenerateRandomMotifsPipe",
     "ParsePWMPipe",
     
@@ -28,5 +30,8 @@ __all__ = [
     "DiPairShufflePipe",
     
     # Injection pipes
-    "InjectMotifsIntoFastaRecordsPipe"
+    "InjectMotifsIntoFastaRecordsPipe",
+    
+    # Utility pipes
+    "UnitAmountConverterPipe"
 ]

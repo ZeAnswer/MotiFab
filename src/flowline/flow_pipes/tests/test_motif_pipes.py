@@ -4,7 +4,7 @@ from flowline import (
     GenerateRandomMotifsPipe,
     ParsePWMPipe,
     SampleMotifsFromPWMPipe,
-    ValidateMotifStringPipe
+    ProcessProvidedMotifPipe
 )
 
 # ------------------------------
@@ -85,6 +85,16 @@ def test_generate_random_motifs_zero_length():
     with pytest.raises(ValueError, match="Motif length must be a positive integer."):
         pipe.execute(data)
 
+def test_generate_random_motifs_with_defaults():
+    """Test generating motifs using default values."""
+    pipe = GenerateRandomMotifsPipe(amount=3, length=8)
+    # Not providing amount and length in the data
+    data = {}
+    result = pipe.execute(data)
+    assert "motif_strings" in result
+    assert len(result["motif_strings"]) == 3  # Should use default amount=3
+    assert all(len(motif) == 8 for motif in result["motif_strings"])  # Should use default length=8
+
 # ------------------------------
 # Tests for ParsePWMPipe
 # ------------------------------
@@ -142,6 +152,23 @@ def test_sample_multiple_motifs_from_pwm(tmp_path, test_pwm_content):
         assert len(motif) == 4  # Motif length should match PWM width
         assert all(nucleotide in "ACGT" for nucleotide in motif)
 
+def test_sample_motif_from_pwm_with_defaults():
+    """Test sampling motifs with a default amount."""
+    # Create a sample PWM matrix directly
+    pwm_matrix = {
+        "A": [0.25, 0.25, 0.25, 0.25],
+        "C": [0.25, 0.25, 0.25, 0.25],
+        "G": [0.25, 0.25, 0.25, 0.25],
+        "T": [0.25, 0.25, 0.25, 0.25]
+    }
+    pipe = SampleMotifsFromPWMPipe(amount=4)
+    result = pipe.execute({"pwm_matrix": pwm_matrix})
+    assert "motif_strings" in result
+    assert len(result["motif_strings"]) == 4  # Should use default amount=4
+    for motif in result["motif_strings"]:
+        assert len(motif) == 4
+        assert all(nucleotide in "ACGT" for nucleotide in motif)
+
 def test_sample_motif_from_pwm_invalid_amount(tmp_path, test_pwm_content):
     """Test sampling motifs with invalid 'amount' (should raise error)."""
     pwm_file_path = create_test_pwm_file(tmp_path, test_pwm_content)
@@ -170,21 +197,32 @@ def test_sample_motif_from_invalid_pwm():
         pipe.execute(invalid_pwm_data)
 
 # ------------------------------
-# Tests for ValidateMotifStringPipe
+# Tests for ProcessProvidedMotifPipe
 # ------------------------------
 
-def test_validate_motif_string():
-    """Test validating a correct motif string."""
-    pipe = ValidateMotifStringPipe()
+def test_process_provided_motif():
+    """Test processing a correct motif string."""
+    pipe = ProcessProvidedMotifPipe()
     data = {"motif_string": "ACGTACGT"}
     result = pipe.execute(data)
 
-    assert "motif_string" in result
-    assert result["motif_string"] == "ACGTACGT"
+    assert "motif_strings" in result
+    assert isinstance(result["motif_strings"], list)
+    assert len(result["motif_strings"]) == 1
+    assert result["motif_strings"][0] == "ACGTACGT"
 
-def test_validate_motif_string_invalid():
-    """Test validating an incorrect motif string (should raise error)."""
-    pipe = ValidateMotifStringPipe()
+def test_process_lowercase_motif():
+    """Test processing a lowercase motif string (should convert to uppercase)."""
+    pipe = ProcessProvidedMotifPipe()
+    data = {"motif_string": "acgtacgt"}
+    result = pipe.execute(data)
+
+    assert "motif_strings" in result
+    assert result["motif_strings"][0] == "ACGTACGT"
+
+def test_process_invalid_motif():
+    """Test processing an incorrect motif string (should raise error)."""
+    pipe = ProcessProvidedMotifPipe()
     data = {"motif_string": "XYZ"}
 
     with pytest.raises(ValueError, match="Invalid motif character 'X' in provided motif."):

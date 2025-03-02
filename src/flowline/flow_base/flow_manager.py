@@ -8,6 +8,7 @@ def merge_data(existing, new, mapping=None):
     for key, value in new.items():
         mapped_key = mapping[key] if mapping and key in mapping else key
         existing[mapped_key] = value
+    return existing
 
 
 class FlowManager:
@@ -34,77 +35,108 @@ class FlowManager:
         # Dictionary of final outputs (from nodes with no downstreams)
         self.final_outputs = {}
         
+        # Store the start node
+        self.source = start_node
+        
         # Add the starting node to the manager.
         self._enqueue(start_node)
     
     def _enqueue(self, node:FlowPipe):
         """Add a node to the queue and initialize its accumulated data if not already present."""
         if node not in self.accumulated:
-            self.accumulated[node] = node.get_external_inputs  # start with an empty dict
+            self.accumulated[node] = {}  # Start with an empty dict
             self.queue.append(node)
     
-    def run(self, initial_data):
+    def run(self, override_data=None):
         """
-        Runs the flow, starting with the provided initial_data (a dict).
-        The initial_data is assigned to the starting node.
+        Run the flow with the provided initial data.
         
-        :param initial_data: A dict representing the initial input to the starting FlowPipe.
-        :return: A dict of final outputs from nodes with no downstream.
+        :param override_data: Dictionary containing initial data to override source defaults.
+        :return: Dictionary of final outputs.
         """
-        # We assume that the first node in the queue is the starting node.
-        # Set its accumulated input to the provided initial_data.
-        if not self.queue:
-            raise RuntimeError("No starting node in the pipeline.")
-        start_node = self.queue[0]
-        self.accumulated[start_node] = copy.deepcopy(initial_data)
+        # Validate the flow before running
+        self.validate_flow()
         
-        # Process until the queue is empty.
+        # Reset accumulated data and queue
+        self.accumulated = {}
+        self.queue = []
+        self.final_outputs = {}
+        
+        # Initialize with the source node
+        initial_data = {}
+        
+        # If source is a FlowSource, use its initial_inputs
+        if isinstance(self.source, FlowPipe) and hasattr(self.source, 'initial_inputs'):
+            initial_data.update(self.source.initial_inputs)
+            
+        # If override data is provided, it takes precedence
+        if override_data:
+            initial_data.update(override_data)
+            
+        # Start with the source node
+        self._enqueue(self.source)
+        self.accumulated[self.source] = initial_data
+
+        # Track nodes that have been deferred due to missing inputs
+        deferred_count = {}  # Count how many times each node has been deferred
+        max_deferrals = 100  # Maximum times a node can be deferred before we consider it deadlocked
+        
+        # Process nodes until the queue is empty
         while self.queue:
-            progress_made = False
+            current_node = self.queue.pop(0)
+            input_data = self.accumulated[current_node]
             
-            # Iterate over a copy of the queue (we may modify self.queue during iteration).
-            for node in list(self.queue):
-                # Check if all required inputs are present.
-                required = node.get_inputs()
-                available = self.accumulated[node]
-                if all(name in available for name in required):
-                    # Prepare a subset dictionary with only the required inputs.
-                    # Use deep copy to avoid accidental modification.
-                    node_inputs = {name: copy.deepcopy(available[name]) for name in required}
-                    
-                    # Execute the node.
-                    try:
-                        node_output = node.execute(node_inputs)
-                    except Exception as e:
-                        raise RuntimeError(f"Error executing node {node}: {e}")
-                    
-                    # Remove the node from the queue and its accumulated entry.
-                    self.queue.remove(node)
-                    del self.accumulated[node]
-                    
-                    progress_made = True
-                    
-                    # If the node has downstream nodes, merge its output into each.
-                    downstreams = node.get_downstream()
-                    if downstreams:
-                        for down_node in downstreams:
-                            if down_node not in self.accumulated:
-                                self.accumulated[down_node] = {}
-                                self.queue.append(down_node)
-                            # Merge the current node's output into the downstream's accumulator.
-                            merge_data(self.accumulated[down_node], node_output, node.get_output_mapping_of(down_node))
-                    else:
-                        # No downstream nodes; treat its output as final.
-                        merge_data(self.final_outputs, node_output)
-                    
-                    # Break out of the loop to restart checking from the front.
-                    break
+            # Check if all required inputs are present before executing
+            missing_inputs = []
+            for required_input in current_node.get_required_inputs():
+                if required_input not in input_data:
+                    missing_inputs.append(required_input)
             
-            # If no node was ready to execute in this pass, then there is a deadlock.
-            if not progress_made:
-                unresolved = [node for node in self.queue]
-                raise RuntimeError(f"Deadlock: The following nodes still lack required inputs: " +
-                                   ", ".join(str(node.get_inputs()) for node in unresolved))
+            # If inputs are missing, defer execution by putting it back in the queue
+            if missing_inputs:
+                # Increment deferral count for this node
+                count = deferred_count.get(current_node, 0) + 1
+                deferred_count[current_node] = count
+                
+                # Check for potential deadlock (node deferred too many times)
+                if count > max_deferrals:
+                    raise RuntimeError(
+                        f"Execution deadlock detected: Node {current_node} has been deferred {max_deferrals} times. "
+                        f"Missing inputs: {missing_inputs}. Available inputs: {list(input_data.keys())}. "
+                        f"This suggests a potential issue with the flow configuration or input data."
+                    )
+                
+                # Put the node back at the end of the queue for later execution
+                self.queue.append(current_node)
+                continue
+            
+            # Execute the node (all required inputs are present)
+            output_data = current_node.execute(input_data)
+            
+            # Ensure output_data is a dictionary, default to empty dict if None
+            if output_data is None:
+                output_data = {}
+            
+            # If the node has no downstream nodes, add its outputs to final_outputs
+            if not current_node.get_downstream():
+                self.final_outputs.update(output_data)
+            else:
+                # For each downstream node
+                for downstream in current_node.get_downstream():
+                    # Get the output mapping for this downstream node
+                    output_mapping = current_node.get_output_mapping_of(downstream)
+                    
+                    # Map the outputs to the downstream node's inputs
+                    mapped_data = {}
+                    merge_data(mapped_data, output_data, output_mapping)
+                    
+                    # If the downstream node isn't in the accumulated dict, add it
+                    if downstream not in self.accumulated:
+                        self.accumulated[downstream] = {}
+                        self.queue.append(downstream)
+                    
+                    # Merge the mapped data into the downstream node's accumulated data
+                    self.accumulated[downstream].update(mapped_data)
         
         return self.final_outputs
 
@@ -149,7 +181,7 @@ class FlowManager:
         start_node = self.queue[0]
         dfs(start_node)
 
-        # Now, for every node in the visited set, simulate its “accumulated inputs”.
+        # Now, for every node in the visited set, simulate its "accumulated inputs".
         # For the start node, if it requires inputs, we simulate that the external system provides exactly one value per input.
         simulated_inputs = {}  # node -> dict: input name -> list of source strings.
         for node in visited:
@@ -160,33 +192,53 @@ class FlowManager:
             simulated_inputs[start_node][req] = [f"ext_{req}"]
 
         # For every other node, accumulate outputs from its upstream nodes.
-        # If a required input is not provided by any upstream node, we will also check for the nodes external_inputs (defaults).
-        # Here we assume that the upstream node's outputs are given by node.get_outputs() (a list of names).
+        # If a required input is not provided by any upstream node, we will check if the node has a default value for it.
         for node in visited:
             if node is start_node:
                 continue
-            # For each upstream node, add each output that matches one of node's required inputs.
-            acc = {}
+                
+            # Keep track of which inputs are provided by upstream nodes
+            provided_inputs = {}
+            
+            # Check each upstream node and its outputs
             for up in upstream.get(node, []):
-                for out_name in up.get_outputs():
-                    if out_name in node.get_inputs():
-                        # Check for duplicate: if already exists, we flag it.
-                        if out_name in acc:
-                            raise RuntimeError(
-                                f"Duplicate input '{out_name}' for node {node}. "
-                                f"Upstream nodes {acc[out_name]} and {up} both supply it. "
-                                "Consider using an output filter to resolve this."
-                            )
-                        acc[out_name] = up  # store the upstream node reference (for error messaging)
-            # Add the external inputs (defaults) if not already provided.
-            # Save the simulated inputs for this node as a dict mapping input name -> list (of length 1 if present)
-            # For our simulation we need to ensure that every required input is provided.
-            merge_data(acc, node.get_external_inputs())
+                output_mapping = up.get_output_mapping_of(node)
+                
+                # If this upstream node has an output mapping for the downstream node
+                if output_mapping:
+                    for out_name, mapped_name in output_mapping.items():
+                        if mapped_name in node.get_inputs():
+                            if mapped_name in provided_inputs:
+                                raise RuntimeError(
+                                    f"Duplicate input '{mapped_name}' for node {node}. "
+                                    f"Upstream nodes {provided_inputs[mapped_name]} and {up} both supply it. "
+                                    "Consider using an output filter to resolve this."
+                                )
+                            provided_inputs[mapped_name] = up
+                            simulated_inputs[node][mapped_name] = [f"from_{str(up)}"]
+                else:
+                    # No mapping, check for direct match between outputs and inputs
+                    for out_name in up.get_outputs():
+                        if out_name in node.get_inputs():
+                            if out_name in provided_inputs:
+                                raise RuntimeError(
+                                    f"Duplicate input '{out_name}' for node {node}. "
+                                    f"Upstream nodes {provided_inputs[out_name]} and {up} both supply it. "
+                                    "Consider using an output filter to resolve this."
+                                )
+                            provided_inputs[out_name] = up
+                            simulated_inputs[node][out_name] = [f"from_{str(up)}"]
+            
+            # Check if all required inputs are provided
+            required_inputs = node.get_required_inputs()
             for req in node.get_inputs():
-                if req not in acc:
-                    raise RuntimeError(f"Node {node} requires input '{req}' which is not provided by any upstream node.")
-                # Wrap it as a list to follow our convention.
-                simulated_inputs[node][req] = [f"from_{str(acc[req])}"]
+                if req not in provided_inputs:
+                    # If input is required and not provided, raise error
+                    if req in required_inputs:
+                        raise RuntimeError(f"Node {node} requires input '{req}' which is not provided by any upstream node.")
+                    # Otherwise it's optional, simulate it with default value
+                    else:
+                        simulated_inputs[node][req] = [f"default_value"]
         
         # Next, check that each node's own outputs list has no duplicates.
         for node in visited:

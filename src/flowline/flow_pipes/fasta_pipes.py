@@ -14,16 +14,16 @@ class LoadFastaPipe(FlowPipe):
             - "desc" (str): The full header line (without ">").
             - "seq" (str): The concatenated sequence.
 
-    External Inputs:
-        - "fasta_file_path"
-
     Raises:
         - ValueError if the file does not start with a header line.
     """
-    __doc__ = __doc__ 
-    def __init__(self, file_path = None):
-        super().__init__(inputs=["fasta_file_path"], outputs=["fasta_records"], action=self.load_fasta, external_inputs={"fasta_file_path": file_path})
-
+    def __init__(self):
+        super().__init__(
+            inputs=["fasta_file_path"], 
+            outputs=["fasta_records"], 
+            action=self.load_fasta
+        )
+    
     def load_fasta(self, data):
         file_path = data["fasta_file_path"]
         records = []
@@ -66,17 +66,22 @@ class WriteFastaPipe(FlowPipe):
     Outputs:
         - "write_success" (bool): Whether the operation was successful.
         - "fasta_file_path" (str): The path to the written file.
-        
-    External Inputs:
-        - "fasta_file_path"
     """
 
-    def __init__(self, file_path = None):
-        super().__init__(inputs=["fasta_records", "fasta_file_path"], outputs=["write_success"], action=self.write_fasta, external_inputs={"fasta_file_path": file_path})
+    def __init__(self, fasta_file_path = None):
+        super().__init__(inputs=["fasta_records", "fasta_file_path"], outputs=["write_success"], action=self.write_fasta)
+        # Store default value as instance variable
+        self.default_fasta_file_path = fasta_file_path
+        
+        # Register which inputs have default values
+        optional_inputs = []
+        if fasta_file_path is not None:
+            optional_inputs.append("fasta_file_path")
+        self.set_optional_inputs(optional_inputs)
 
     def write_fasta(self, data):
         records = data["fasta_records"]
-        output_path = data["fasta_file_path"]
+        output_path = data.get("fasta_file_path", self.default_fasta_file_path)
 
         try:
             with open(output_path, 'w') as f:
@@ -91,36 +96,100 @@ class WriteFastaPipe(FlowPipe):
         return {"write_success": True, "fasta_file_path": output_path}
 
 
+import random
+
 class SelectRandomFastaSequencesPipe(FlowPipe):
     """
-    FlowPipe to select a random subset of FASTA records.
+    FlowPipe to select a random subset of FASTA records, allowing duplicates if necessary.
 
     Inputs:
         - "fasta_records" (list): A list of FASTA record dictionaries.
-        - "amount" (int): The amount of records to select.
+        - "amount" (int): The number of records to select.
+        - "excluded_indices" (list, optional): Indices that must not be selected.
+        - "mandatory_indices" (list, optional): Indices that must always be included (once).
 
     Outputs:
-        - "fasta_records" (list): A randomly selected subset of records.
+        - "fasta_records" (list): A randomly selected subset of records (duplicates allowed if needed).
         - "indices" (list): The indices of the selected records.
-        
-    External Inputs:
-        - "amount"
 
     Raises:
-        - ValueError if the requested count is greater than the available records.
+        - ValueError if mandatory indices are out of range.
+        - ValueError if excluded indices are out of range.
+        - ValueError if mandatory indices and excluded indices overlap.
     """
 
-    def __init__(self, amount = None):
-        super().__init__(inputs=["fasta_records", "amount"], outputs=["fasta_records", "indices"], action=self.select_random_sequences, external_inputs={"amount": amount})
+    def __init__(self, amount=None, excluded_indices=None, mandatory_indices=None):
+        super().__init__(
+            inputs=["fasta_records", "amount", "excluded_indices", "mandatory_indices"],
+            outputs=["fasta_records", "indices"],
+            action=self.select_random_sequences
+        )
+        # Store default values as instance variables
+        self.default_amount = amount
+        self.default_excluded_indices = excluded_indices or []
+        self.default_mandatory_indices = mandatory_indices or []
+        
+        # Register which inputs have default values
+        optional_inputs = []
+        if amount is not None:
+            optional_inputs.append("amount")
+        if excluded_indices is not None:
+            optional_inputs.append("excluded_indices")
+        if mandatory_indices is not None:
+            optional_inputs.append("mandatory_indices")
+        self.set_optional_inputs(optional_inputs)
 
     def select_random_sequences(self, data):
         records = data["fasta_records"]
-        count = data["amount"]
+        count = data.get("amount", self.default_amount)
+        total_records = len(records)
 
-        if count > len(records):
-            raise ValueError("Requested count exceeds the amount of available records.")
+        excluded_indices = set(data.get("excluded_indices", self.default_excluded_indices))  # Set for fast lookup
+        mandatory_indices = set(data.get("mandatory_indices", self.default_mandatory_indices))  # Set for fast lookup
 
-        indices = random.sample(range(len(records)), count)
-        selected_records = [records[i] for i in indices]
+        # --- Validate Record Count ---
+        if total_records == 0:
+            raise ValueError("No records available for selection.")
+
+        # --- Validate Mandatory Indices ---
+        out_of_range_mandatory = {i for i in mandatory_indices if i < 0 or i >= total_records}
+        if out_of_range_mandatory:
+            raise ValueError(
+                f"Mandatory indices {sorted(out_of_range_mandatory)} are out of range (valid range: 0-{total_records - 1})."
+            )
+
+        # --- Ensure Mandatory & Excluded Indices Don't Overlap ---
+        conflicting_indices = mandatory_indices & excluded_indices
+        if conflicting_indices:
+            raise ValueError(
+                f"Mandatory indices {sorted(conflicting_indices)} are also in the excluded list. Remove these from either set."
+            )
+            
+        # --- Validate Mandatory Indices Amount ---
+        if len(mandatory_indices) > count:
+            raise ValueError(
+                f"Number of mandatory indices ({len(mandatory_indices)}) exceeds the requested selection count ({count})."
+            )
+
+        # --- Calculate Available Indices ---
+        available_indices = set(range(total_records)) - excluded_indices
+        available_indices_without_mandatory =available_indices - mandatory_indices  # Ensure mandatory indices appear exactly once
+
+        # --- Base Selection ---
+        selected_indices = list(mandatory_indices)  # Include mandatory indices first
+        remaining_needed = count - len(selected_indices)
+
+        # --- Fill Remaining Needed ---
+        # First we select from the available list not including mandatory indices. if we need more than available, we will add duplicates including mandatory indices.
+        if remaining_needed > 0:
+            selected_indices.extend(random.sample(list(available_indices_without_mandatory), min(remaining_needed, len(available_indices_without_mandatory))))
+            remaining_needed = count - len(selected_indices)
         
-        return {"fasta_records": selected_records, "indices": indices}
+        # --- Add Duplicates ---
+        if remaining_needed > 0:
+            selected_indices.extend(random.choices(selected_indices, k=remaining_needed))
+        
+
+        selected_records = [records[i] for i in selected_indices]
+
+        return {"fasta_records": selected_records, "indices": selected_indices}

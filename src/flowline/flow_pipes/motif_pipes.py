@@ -16,10 +16,6 @@ class GenerateRandomMotifsPipe(FlowPipe):
     Outputs:
         - "motif_strings" (list): A list of randomly generated motif strings.
 
-    External Inputs:
-        - "amount"
-        - "length"
-
     Raises:
         - ValueError if the motif length or amount of motifs is not positive.
     """
@@ -29,12 +25,22 @@ class GenerateRandomMotifsPipe(FlowPipe):
             inputs=["amount", "length"],
             outputs=["motif_strings"],
             action=self.generate_random_motifs,
-            external_inputs={"amount": amount, "length": length},
         )
+        # Store default values as instance variables if needed
+        self.default_amount = amount
+        self.default_length = length
+        
+        # Register which inputs have default values
+        optional_inputs = []
+        if amount is not None:
+            optional_inputs.append("amount")
+        if length is not None:
+            optional_inputs.append("length")
+        self.set_optional_inputs(optional_inputs)
 
     def generate_random_motifs(self, data):
-        num_motifs = data["amount"]
-        motif_length = data["length"]
+        num_motifs = data.get("amount", self.default_amount)
+        motif_length = data.get("length", self.default_length)
 
         if num_motifs <= 0:
             raise ValueError("The amount of motifs must be a positive integer.")
@@ -153,19 +159,24 @@ class SampleMotifsFromPWMPipe(FlowPipe):
     Outputs:
         - "motif_strings" (list of str): A list of motif strings sampled based on the PWM probabilities.
 
-    External Inputs:
-        - "amount"
-        
     Raises:
         - ValueError if the PWM format is invalid or the amount of samples is non-positive.
     """
 
     def __init__(self, amount=None):
-        super().__init__(inputs=["pwm_matrix", "amount"], outputs=["motif_strings"], action=self.sample_motifs, external_inputs={"amount": amount})
-
+        super().__init__(inputs=["pwm_matrix", "amount"], outputs=["motif_strings"], action=self.sample_motifs)
+        # Store default value as instance variable
+        self.default_amount = amount
+        
+        # Register which inputs have default values
+        optional_inputs = []
+        if amount is not None:
+            optional_inputs.append("amount")
+        self.set_optional_inputs(optional_inputs)
+        
     def sample_motifs(self, data):
         pwm_dict = data["pwm_matrix"]
-        num_samples = data["amount"]
+        num_samples = data.get("amount", self.default_amount)
 
         if not isinstance(num_samples, int) or num_samples <= 0:
             raise ValueError("Amount of samples must be a positive integer.")
@@ -197,28 +208,35 @@ class SampleMotifsFromPWMPipe(FlowPipe):
         return f"SampleMotifFromPWMPipe(Sampling {self.outputs} based on PWM probabilities)"
 
 
-class ValidateMotifStringPipe(FlowPipe):
+class ProcessProvidedMotifPipe(FlowPipe):
     """
-    FlowPipe to validate a motif string, ensuring it consists only of A, C, G, and T.
-
+    FlowPipe to validate a motif string and return it as a list.
+    
     Inputs:
         - "motif_string" (str): The motif string to validate.
-
+        
     Outputs:
-        - "motif_string" (str): The validated motif string.
-
+        - "motif_strings" (list of str): A list containing the validated motif string.
+        
     Raises:
         - ValueError if the motif contains invalid characters.
     """
-
+    
     def __init__(self):
-        super().__init__(inputs=["motif_string"], outputs=["motif_string"], action=self.validate_motif)
-
-    def validate_motif(self, data):
+        super().__init__(inputs=["motif_string"], outputs=["motif_strings"], action=self.process_motif)
+        
+    def process_motif(self, data):
         motif_str = data["motif_string"]
         allowed = set("ACGT")
         motif_str = motif_str.upper()
+        
         for ch in motif_str:
             if ch not in allowed:
                 raise ValueError(f"Invalid motif character '{ch}' in provided motif. Allowed characters are A, C, G, T.")
-        return {"motif_string": motif_str}
+                
+        # Return the validated motif as a list to be consistent with other motif providers
+        return {"motif_strings": [motif_str]}
+        
+    def __str__(self):
+        """Returns a debug-friendly representation of the ProcessProvidedMotifPipe."""
+        return "ProcessProvidedMotifPipe(Validating and processing provided motif string)"

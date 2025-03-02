@@ -108,13 +108,112 @@ def test_select_random_fasta_valid(create_fasta_file):
     assert len(result["fasta_records"]) == 2
     assert len(result["indices"]) == 2
 
-def test_select_random_fasta_too_many(create_fasta_file):
-    """Test requesting more sequences than available."""
+def test_select_random_fasta_with_exclusions(create_fasta_file):
+    """Test selecting sequences while excluding certain indices."""
     load_pipe = LoadFastaPipe()
     records = load_pipe.execute({"fasta_file_path": create_fasta_file})["fasta_records"]
 
     select_pipe = SelectRandomFastaSequencesPipe()
-    data = {"fasta_records": records, "amount": 10}
+    excluded = [0]  # Exclude first sequence
+    data = {"fasta_records": records, "amount": 2, "excluded_indices": excluded}
+    result = select_pipe.execute(data)
 
-    with pytest.raises(ValueError, match="Requested count exceeds the amount of available records."):
+    assert "fasta_records" in result
+    assert "indices" in result
+    assert len(result["fasta_records"]) == 2
+    assert len(result["indices"]) == 2
+    assert not any(idx in excluded for idx in result["indices"])  # Ensure excluded indices are not in the result
+
+def test_select_random_fasta_with_mandatory(create_fasta_file):
+    """Test selecting sequences with mandatory indices included."""
+    load_pipe = LoadFastaPipe()
+    records = load_pipe.execute({"fasta_file_path": create_fasta_file})["fasta_records"]
+
+    select_pipe = SelectRandomFastaSequencesPipe()
+    mandatory = [1]  # Force include second sequence
+    data = {"fasta_records": records, "amount": 2, "mandatory_indices": mandatory}
+    result = select_pipe.execute(data)
+
+    assert "fasta_records" in result
+    assert "indices" in result
+    assert len(result["fasta_records"]) == 2
+    assert len(result["indices"]) == 2
+    assert any(idx in mandatory for idx in result["indices"])  # Ensure mandatory indices are included
+
+def test_select_random_fasta_with_exclusions_and_mandatory(create_fasta_file):
+    """Test selecting sequences with both exclusions and mandatory indices."""
+    load_pipe = LoadFastaPipe()
+    records = load_pipe.execute({"fasta_file_path": create_fasta_file})["fasta_records"]
+
+    select_pipe = SelectRandomFastaSequencesPipe()
+    mandatory = [1]  # Force include second sequence
+    excluded = [0]   # Exclude first sequence
+    data = {"fasta_records": records, "amount": 2, "mandatory_indices": mandatory, "excluded_indices": excluded}
+    result = select_pipe.execute(data)
+
+    assert "fasta_records" in result
+    assert "indices" in result
+    assert len(result["fasta_records"]) == 2
+    assert len(result["indices"]) == 2
+    assert any(idx in mandatory for idx in result["indices"])  # Ensure mandatory is included
+    assert not any(idx in excluded for idx in result["indices"])  # Ensure excluded indices are not present
+
+def test_select_random_fasta_exceeds_available_with_duplicates(create_fasta_file):
+    """Test requesting more sequences than available, allowing duplicates."""
+    load_pipe = LoadFastaPipe()
+    records = load_pipe.execute({"fasta_file_path": create_fasta_file})["fasta_records"]
+
+    select_pipe = SelectRandomFastaSequencesPipe()
+    data = {"fasta_records": records, "amount": 10}  # More than available
+
+    result = select_pipe.execute(data)
+
+    assert "fasta_records" in result
+    assert "indices" in result
+    assert len(result["fasta_records"]) == 10
+    assert len(result["indices"]) == 10  # Ensuring duplicates filled the selection
+
+def test_select_random_fasta_with_too_many_mandatory(create_fasta_file):
+    """Test requesting fewer sequences than the number of mandatory indices."""
+    load_pipe = LoadFastaPipe()
+    records = load_pipe.execute({"fasta_file_path": create_fasta_file})["fasta_records"]
+
+    select_pipe = SelectRandomFastaSequencesPipe()
+    mandatory = [0, 1, 2]  # All available indices as mandatory
+    data = {"fasta_records": records, "amount": 2, "mandatory_indices": mandatory}
+
+    with pytest.raises(ValueError, match="Number of mandatory indices.*exceeds the requested selection count"):
+        select_pipe.execute(data)
+
+def test_select_random_fasta_with_out_of_range_mandatory(create_fasta_file):
+    """Test providing mandatory indices that are out of range."""
+    load_pipe = LoadFastaPipe()
+    records = load_pipe.execute({"fasta_file_path": create_fasta_file})["fasta_records"]
+
+    select_pipe = SelectRandomFastaSequencesPipe()
+    mandatory = [5]  # Out of range index (since we have only 3 records)
+    data = {"fasta_records": records, "amount": 2, "mandatory_indices": mandatory}
+
+    with pytest.raises(ValueError, match="Mandatory indices .* are out of range"):
+        select_pipe.execute(data)
+
+def test_select_random_fasta_with_conflicting_mandatory_and_excluded(create_fasta_file):
+    """Test mandatory and excluded indices conflicting (same index)."""
+    load_pipe = LoadFastaPipe()
+    records = load_pipe.execute({"fasta_file_path": create_fasta_file})["fasta_records"]
+
+    select_pipe = SelectRandomFastaSequencesPipe()
+    mandatory = [1]
+    excluded = [1]
+    data = {"fasta_records": records, "amount": 2, "mandatory_indices": mandatory, "excluded_indices": excluded}
+
+    with pytest.raises(ValueError, match="Mandatory indices .* are also in the excluded list"):
+        select_pipe.execute(data)
+
+def test_select_random_fasta_with_empty_records():
+    """Test selecting sequences when no records are available."""
+    select_pipe = SelectRandomFastaSequencesPipe()
+    data = {"fasta_records": [], "amount": 2}
+
+    with pytest.raises(ValueError, match="No records available for selection."):
         select_pipe.execute(data)
