@@ -12,6 +12,7 @@ Features:
   - Generate single datasets or parameter sweeps with multiple combinations
   - Customize test sizes, injection rates, and background generation methods
   - Export summary information for further analysis
+  - Support for configuration via INI files
 
 Basic Usage:
   python src/motif_dataset_generator.py --fasta input.fasta --motif-string ACGTACGT --search-size 100 --injection-rate 10%
@@ -20,6 +21,10 @@ Parameter Sweep Usage:
   python src/motif_dataset_generator.py --fasta input.fasta --motif-string ACGTACGT 
       --test-sizes 40,60,100,200 --injection-rates 5%,10%,20% --replicates 3
       --output-dir ./datasets --summary-file summary.csv
+
+Config File Usage:
+  python src/motif_dataset_generator.py --config my_config.ini
+  (Command line arguments override config file settings)
 """
 
 import os
@@ -27,6 +32,7 @@ import sys
 import csv
 import argparse
 import random
+import configparser
 from itertools import product
 
 from flowline import (FlowManager, FlowSource, FlowPipe, FlowOutputFilter,
@@ -345,9 +351,44 @@ def generate_multiple_datasets(flow_manager, args):
     return success_count == total_count
 
 
+def load_config_file(config_file):
+    """
+    Load configuration from an INI file.
+
+    Args:
+        config_file (str): Path to the INI file
+
+    Returns:
+        dict: Dictionary containing configuration parameters
+    """
+    config = configparser.ConfigParser()
+    try:
+        config.read(config_file)
+        
+        # Convert the config to a dictionary
+        config_dict = {}
+        
+        # Process the DEFAULT section if it exists
+        if 'DEFAULT' in config:
+            for key, value in config['DEFAULT'].items():
+                config_dict[key.replace('-', '_')] = value
+                
+        # Process the specific sections
+        for section in config.sections():
+            for key, value in config[section].items():
+                # Convert hyphens in key names to underscores for consistency with argparse
+                config_dict[key.replace('-', '_')] = value
+                
+        return config_dict
+    except Exception as e:
+        print(f"Error loading configuration file {config_file}: {e}")
+        sys.exit(1)
+
+
 def parse_args():
     """
-    Parse command-line arguments for both single dataset and parameter sweep modes.
+    Parse command-line arguments and optionally load from a configuration file.
+    Command-line arguments override config file values.
     
     Returns:
         argparse.Namespace: The parsed arguments
@@ -356,15 +397,20 @@ def parse_args():
         description="MotiFab: Generate benchmark datasets for motif enrichment tools"
     )
     
+    # Configuration file option
+    parser.add_argument(
+        "--config",
+        help="Path to a configuration INI file containing parameters"
+    )
+    
     # Input FASTA file
     parser.add_argument(
         "--fasta",
-        required=True,
         help="Path to the input FASTA file containing source sequences"
     )
     
     # Motif specification: exactly one of these must be provided
-    motif_group = parser.add_mutually_exclusive_group(required=True)
+    motif_group = parser.add_mutually_exclusive_group()
     motif_group.add_argument(
         "--motif-length",
         type=int,
@@ -392,22 +438,18 @@ def parse_args():
     sweep_group.add_argument(
         "--replicates",
         type=int,
-        default=1,
         help="Number of replicate datasets to generate per parameter combination (default: 1)"
     )
     sweep_group.add_argument(
         "--output-dir",
-        default=".",
         help="Directory to store output files for parameter sweep (default: current directory)"
     )
     sweep_group.add_argument(
         "--prefix",
-        default="run",
         help="Filename prefix for output files in parameter sweep (default: 'run')"
     )
     sweep_group.add_argument(
         "--summary-file",
-        default="dataset_summary.csv",
         help="CSV file to record parameters and filenames (default: 'dataset_summary.csv')"
     )
     
@@ -424,12 +466,10 @@ def parse_args():
     )
     single_group.add_argument(
         "--output-search",
-        default="search_set.fasta",
         help="Output file path for search set (default: 'search_set.fasta')"
     )
     single_group.add_argument(
         "--output-background",
-        default="background_set.fasta",
         help="Output file path for background set (default: 'background_set.fasta')"
     )
     
@@ -437,20 +477,17 @@ def parse_args():
     parser.add_argument(
         "--background-size",
         type=int,
-        default=1000,
         help="Number of sequences in the background set (default: 1000)"
     )
     parser.add_argument(
         "--background-mode",
         choices=["select", "shuffle"],
-        default="select",
         help="Method for generating background: 'select' (use remaining sequences) or "
              "'shuffle' (shuffle search sequences; default: select)"
     )
     parser.add_argument(
         "--shuffle-method",
         choices=["naive", "di-pair"],
-        default="naive",
         help="If background mode is 'shuffle', specify method: 'naive' or 'di-pair' (default: naive)"
     )
     parser.add_argument(
@@ -459,7 +496,71 @@ def parse_args():
         help="Parse arguments without generating datasets (for testing)"
     )
     
+    # First parse the command line arguments
     args = parser.parse_args()
+    
+    # If a config file is specified, load it and merge with command line arguments
+    if args.config:
+        config_dict = load_config_file(args.config)
+        
+        # Create a new namespace with config file values
+        config_args = argparse.Namespace()
+        
+        # Set defaults from the config file
+        for key, value in config_dict.items():
+            # Special case for the dry-run flag (which is a boolean)
+            if key == 'dry_run':
+                if value.lower() in ('true', 'yes', '1', 'on'):
+                    setattr(config_args, key, True)
+                continue
+            
+            # Handle integer values
+            if key in ('motif_length', 'search_size', 'background_size', 'replicates'):
+                try:
+                    setattr(config_args, key, int(value))
+                except ValueError:
+                    print(f"Warning: Could not convert {key}={value} to integer in config file. Using default.")
+            else:
+                setattr(config_args, key, value)
+        
+        # Override with command line arguments (any that were explicitly provided)
+        for key, value in vars(args).items():
+            if value is not None:  # Only override if value was provided on command line
+                setattr(config_args, key, value)
+        
+        # Use the merged arguments
+        args = config_args
+    
+    # Set default values for args not specified either in config or command line
+    if not hasattr(args, 'replicates') or args.replicates is None:
+        args.replicates = 1
+    if not hasattr(args, 'output_dir') or args.output_dir is None:
+        args.output_dir = '.'
+    if not hasattr(args, 'prefix') or args.prefix is None:
+        args.prefix = 'run'
+    if not hasattr(args, 'summary_file') or args.summary_file is None:
+        args.summary_file = 'dataset_summary.csv'
+    if not hasattr(args, 'output_search') or args.output_search is None:
+        args.output_search = 'search_set.fasta'
+    if not hasattr(args, 'output_background') or args.output_background is None:
+        args.output_background = 'background_set.fasta'
+    if not hasattr(args, 'background_size') or args.background_size is None:
+        args.background_size = 1000
+    if not hasattr(args, 'background_mode') or args.background_mode is None:
+        args.background_mode = 'select'
+    if not hasattr(args, 'shuffle_method') or args.shuffle_method is None:
+        args.shuffle_method = 'naive'
+    if not hasattr(args, 'dry_run'):
+        args.dry_run = False
+    
+    # Validate required arguments
+    if not args.fasta:
+        parser.error("No FASTA input file specified. Use --fasta or provide it in the config file.")
+    
+    # Ensure at least one motif option is provided
+    if not (args.motif_length or args.motif_string or args.motif_file):
+        parser.error("No motif specification provided. Use one of --motif-length, --motif-string, or --motif-file.")
+    
     return args
 
 
@@ -474,13 +575,11 @@ def determine_run_mode(args):
         str: 'sweep' for parameter sweep mode, 'single' for single dataset mode
     """
     # Check if parameter sweep arguments are provided
-    if args.test_sizes and args.injection_rates:
-        print("Running in parameter sweep mode")
+    if hasattr(args, 'test_sizes') and args.test_sizes and hasattr(args, 'injection_rates') and args.injection_rates:
         return 'sweep'
     
     # Check if single dataset arguments are provided
-    if args.search_size and args.injection_rate:
-        print("Running in single dataset mode")
+    if hasattr(args, 'search_size') and args.search_size and hasattr(args, 'injection_rate') and args.injection_rate:
         return 'single'
     
     # Not enough arguments to determine the mode
@@ -496,16 +595,18 @@ def main():
     print("------------------------")
     print("Parameters:")
     for arg, value in vars(args).items():
-        print(f"  {arg}: {value}")
+        # Skip config file parameter in output
+        if arg != 'config':
+            print(f"  {arg}: {value}")
     print()
-    
-    # Determine the run mode
-    mode = determine_run_mode(args)
     
     # If dry-run is set, exit here
     if args.dry_run:
         print("Dry run mode: no datasets will be generated")
         return 0
+    
+    # Determine the run mode
+    mode = determine_run_mode(args)
     
     if mode is None:
         print("Error: Insufficient arguments to determine run mode.")
@@ -525,6 +626,7 @@ def main():
     
     # Execute based on the mode
     if mode == 'single':
+        print("Running in single dataset mode")
         
         # Create parameters for single dataset run
         dataset_params = {
@@ -546,6 +648,7 @@ def main():
         result = run_dataset_generator(flow_manager, dataset_params)
         return 0 if result else 1
     else:
+        print("Running in parameter sweep mode")
         success = generate_multiple_datasets(flow_manager, args)
         return 0 if success else 1
 
