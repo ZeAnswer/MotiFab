@@ -180,11 +180,17 @@ class SelectRandomFastaSequencesPipe(FlowPipe):
         # --- Fill Remaining Needed ---
         # First we select from the available list not including mandatory indices. if we need more than available, we will add duplicates including mandatory indices.
         if remaining_needed > 0:
+            if not available_indices_without_mandatory:
+                # Can't choose from an empty population, so raise a clearer error
+                raise ValueError(f"Cannot select {count} sequences because all {total_records} records are excluded or mandatory. Inputs: data - {data}, records - {records}, count - {count}, total_records - {total_records}, excluded_indices - {excluded_indices}, mandatory_indices - {mandatory_indices}")
             selected_indices.extend(random.sample(list(available_indices_without_mandatory), min(remaining_needed, len(available_indices_without_mandatory))))
             remaining_needed = count - len(selected_indices)
         
         # --- Add Duplicates ---
         if remaining_needed > 0:
+            if not selected_indices:
+                # Can't choose from an empty population, so raise a clearer error
+                raise ValueError(f"Cannot select {count} sequences because all {total_records} records are excluded.")
             selected_indices.extend(random.choices(selected_indices, k=remaining_needed))
         
 

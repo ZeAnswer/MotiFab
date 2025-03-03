@@ -126,7 +126,7 @@ def build_flow(pipe_config):
     
     try:
         # Validate the flow to make sure all connections are properly set up
-        manager.validate_flow()
+        manager.initialize_and_validate_flow()
         print("Flow validation successful!")
     except RuntimeError as e:
         # If validation fails, provide more debugging information

@@ -28,7 +28,7 @@ def test_valid_pipeline():
     start.add_downstream(node2)
     
     manager = FlowManager(start)
-    assert manager.validate_flow() == True
+    assert manager.initialize_and_validate_flow() == True
 
 def test_valid_split():
     # A valid split: one start node outputs "A"; two downstream nodes each require "A".
@@ -40,7 +40,7 @@ def test_valid_split():
     start.add_downstream(node3)
 
     manager = FlowManager(start)
-    assert manager.validate_flow() == True
+    assert manager.initialize_and_validate_flow() == True
 
 def test_duplicate_input_error():
     # Two upstream nodes provide the same input to a downstream node.
@@ -57,7 +57,7 @@ def test_duplicate_input_error():
 
     manager = FlowManager(start)
     with pytest.raises(RuntimeError, match=re.escape("Duplicate input 'Y'")):
-        manager.validate_flow()
+        manager.initialize_and_validate_flow()
 
 def test_deadlock_missing_input():
     # A node requires an input that is never provided.
@@ -68,7 +68,7 @@ def test_deadlock_missing_input():
 
     manager = FlowManager(start)
     with pytest.raises(RuntimeError, match="requires input 'B' which is not provided"):
-        manager.validate_flow()
+        manager.initialize_and_validate_flow()
 
 def test_cycle_detection():
     # Create a cycle: node1 -> node2 -> node3 -> node1
@@ -82,7 +82,7 @@ def test_cycle_detection():
 
     manager = FlowManager(node1)
     with pytest.raises(RuntimeError, match="Cycle detected"):
-        manager.validate_flow()
+        manager.initialize_and_validate_flow()
 
 
 def test_duplicate_outputs_in_node():
@@ -91,7 +91,7 @@ def test_duplicate_outputs_in_node():
 
     manager = FlowManager(start)
     with pytest.raises(RuntimeError, match="has duplicate outputs"):
-        manager.validate_flow()
+        manager.initialize_and_validate_flow()
 
 def test_duplicate_sink_outputs():
     # Two sink nodes produce the same output.
@@ -104,7 +104,7 @@ def test_duplicate_sink_outputs():
 
     manager = FlowManager(start)
     with pytest.raises(RuntimeError, match="Output 'Y' is produced by multiple sink nodes"):
-        manager.validate_flow()
+        manager.initialize_and_validate_flow()
 
 def test_output_filter_usage():
     # Use a FlowOutputFilter to filter specific outputs before passing them forward.
@@ -116,7 +116,7 @@ def test_output_filter_usage():
     filter_node.add_downstream(node2)
 
     manager = FlowManager(start)
-    assert manager.validate_flow() == True
+    assert manager.initialize_and_validate_flow() == True
 
 def test_successful_execution():
     # A full valid pipeline with execution.

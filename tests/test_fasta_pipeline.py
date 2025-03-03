@@ -60,9 +60,9 @@ def test_pipeline_select_mode(monkeypatch, tmp_path, temp_fasta_file, output_pat
     injection_rate = "50%"  # Expect about 50% of search set get injected.
     provided_motif = "GGGGGGGG"  # Provided motif (should not already be in FASTA).
     output_search, output_background = output_paths
-
+    
     test_args = [
-        "cli.py",
+        "motif_dataset_generator.py",  # Updated module name
         "--fasta", temp_fasta_file,
         "--motif-string", provided_motif,
         "--search-size", str(search_size),
@@ -72,26 +72,28 @@ def test_pipeline_select_mode(monkeypatch, tmp_path, temp_fasta_file, output_pat
         "--output-search", output_search,
         "--output-background", output_background
     ]
+    
     monkeypatch.setattr(sys, "argv", test_args)
-    from src.cli import main
+    # Updated import statement to use the new module
+    from src.motif_dataset_generator import main
     main()
-
+    
     # Load output FASTA files.
     search_records = LoadFastaPipe().execute({"fasta_file_path":output_search})["fasta_records"]
     background_records = LoadFastaPipe().execute({"fasta_file_path":output_background})["fasta_records"]
-
+    
     # Verify that the search set has exactly search_size records.
     assert len(search_records) == search_size
-
+    
     # Count how many records in the search set contain the provided motif.
     injected_count = count_injected(search_records, provided_motif)
     expected_injections = int(round(search_size * 0.5))
     # Allow a difference of at most 1 due to rounding.
     assert abs(injected_count - expected_injections) <= 1
-
+    
     # In select mode, the background set should have exactly background_size records.
     assert len(background_records) == background_size
-
+    
     # Also, ensure that none of the background records contain the injected motif.
     for rec in background_records:
         assert provided_motif not in rec["seq"]
@@ -111,9 +113,9 @@ def test_pipeline_shuffle_mode(monkeypatch, tmp_path, temp_fasta_file, output_pa
     injection_rate = "1"  # Absolute: exactly 1 record gets injected.
     provided_motif = "GGGGGGGG"
     output_search, output_background = output_paths
-
+    
     test_args = [
-        "cli.py",
+        "motif_dataset_generator.py",  # Updated module name
         "--fasta", temp_fasta_file,
         "--motif-string", provided_motif,
         "--search-size", str(search_size),
@@ -124,26 +126,27 @@ def test_pipeline_shuffle_mode(monkeypatch, tmp_path, temp_fasta_file, output_pa
         "--output-search", output_search,
         "--output-background", output_background
     ]
+    
     monkeypatch.setattr(sys, "argv", test_args)
-    from src.cli import main
+    # Updated import statement to use the new module
+    from src.motif_dataset_generator import main
     main()
-
+    
     # Load output FASTA files.
     search_records = LoadFastaPipe().execute({"fasta_file_path":output_search})["fasta_records"]
     background_records = LoadFastaPipe().execute({"fasta_file_path":output_background})["fasta_records"]
-
+    
     # Check that the search set contains exactly search_size records.
     assert len(search_records) == search_size
-
+    
     # Count the number of records with the injected motif.
     injected_count = count_injected(search_records, provided_motif)
     assert injected_count == 1
-
+    
     # In shuffle mode, the background set should have exactly background_size records.
     assert len(background_records) == background_size
-
+    
     # Ensure that each background record contains only valid nucleotides.
     for rec in background_records:
         for ch in rec["seq"]:
             assert ch in "ACGT"
-            

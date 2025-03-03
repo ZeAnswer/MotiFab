@@ -1,13 +1,19 @@
 import copy
 from flowline import FlowPipe
 
-def merge_data(existing, new, mapping=None):
+def merge_data(existing, new, mapping=None, strict=False):
     """
     Merge two dictionaries. If the same key exists in both, then the value is overwritten.
+    If strict is True, then mapping is mandatory and only keys in mapping are copied. the rest are ignored.
+    Performs deep copy of values to avoid modifying the original data.
     """
+    if strict and mapping is None:
+        raise ValueError("merge_data: strict mode requires a mapping to be provided. info dump: existing={}, new={}, mapping={}, strict={}".format(existing, new, mapping, strict))
     for key, value in new.items():
+        if strict and key not in mapping:
+            continue
         mapped_key = mapping[key] if mapping and key in mapping else key
-        existing[mapped_key] = value
+        existing[mapped_key] = copy.deepcopy(value)
     return existing
 
 
@@ -28,24 +34,27 @@ class FlowManager:
         
         :param start_node: The first FlowPipe node in the flow.
         """
-        # A mapping: FlowPipe -> accumulated inputs (as a dict)
-        self.accumulated = {}
-        # Use a list as a queue. We’ll store nodes that still need to be processed.
-        self.queue = []
-        # Dictionary of final outputs (from nodes with no downstreams)
-        self.final_outputs = {}
-        
         # Store the start node
         self.source = start_node
-        
-        # Add the starting node to the manager.
-        self._enqueue(start_node)
+        # Initialize the accumulated data and queue
+        self._initialize_accumulated()
     
     def _enqueue(self, node:FlowPipe):
         """Add a node to the queue and initialize its accumulated data if not already present."""
         if node not in self.accumulated:
             self.accumulated[node] = {}  # Start with an empty dict
             self.queue.append(node)
+    
+    def _initialize_accumulated(self):
+        """Reset the accumulated data and queue."""
+        # A mapping: FlowPipe -> accumulated inputs (as a dict)
+        self.accumulated = {}
+        # Use a list as a queue. We’ll store nodes that still need to be processed.
+        self.queue = []
+        # Dictionary of final outputs (from nodes with no downstreams)
+        self.final_outputs = {}
+        # Add the starting node to the manager.
+        self._enqueue(self.source)
     
     def run(self, override_data=None):
         """
@@ -55,7 +64,7 @@ class FlowManager:
         :return: Dictionary of final outputs.
         """
         # Validate the flow before running
-        self.validate_flow()
+        self.initialize_and_validate_flow()
         
         # Reset accumulated data and queue
         self.accumulated = {}
@@ -67,11 +76,11 @@ class FlowManager:
         
         # If source is a FlowSource, use its initial_inputs
         if isinstance(self.source, FlowPipe) and hasattr(self.source, 'initial_inputs'):
-            initial_data.update(self.source.initial_inputs)
+            merge_data(initial_data, self.source.initial_inputs)
             
         # If override data is provided, it takes precedence
         if override_data:
-            initial_data.update(override_data)
+            merge_data(initial_data, override_data)
             
         # Start with the source node
         self._enqueue(self.source)
@@ -111,7 +120,10 @@ class FlowManager:
                 continue
             
             # Execute the node (all required inputs are present)
-            output_data = current_node.execute(input_data)
+            try:
+                output_data = current_node.execute(input_data)
+            except Exception as e:
+                raise RuntimeError(f"Error executing node {current_node}: {e}")
             
             # Ensure output_data is a dictionary, default to empty dict if None
             if output_data is None:
@@ -119,7 +131,7 @@ class FlowManager:
             
             # If the node has no downstream nodes, add its outputs to final_outputs
             if not current_node.get_downstream():
-                self.final_outputs.update(output_data)
+                merge_data(self.final_outputs, output_data)
             else:
                 # For each downstream node
                 for downstream in current_node.get_downstream():
@@ -128,7 +140,8 @@ class FlowManager:
                     
                     # Map the outputs to the downstream node's inputs
                     mapped_data = {}
-                    merge_data(mapped_data, output_data, output_mapping)
+                    strict = True if output_mapping else False
+                    merge_data(mapped_data, output_data, output_mapping, strict=strict)
                     
                     # If the downstream node isn't in the accumulated dict, add it
                     if downstream not in self.accumulated:
@@ -136,11 +149,11 @@ class FlowManager:
                         self.queue.append(downstream)
                     
                     # Merge the mapped data into the downstream node's accumulated data
-                    self.accumulated[downstream].update(mapped_data)
+                    merge_data(self.accumulated[downstream], mapped_data)
         
         return self.final_outputs
 
-    def validate_flow(self):
+    def initialize_and_validate_flow(self):
         """
         Validate the pipeline flow. This method performs three checks:
           1. Every node (except the start node) can have all its required inputs satisfied by its upstream nodes.
@@ -154,6 +167,9 @@ class FlowManager:
         Raises:
           RuntimeError with an explanatory message if validation fails.
         """
+        # Initializes the accumulated inputs for the flow to make sure we are starting from a clean slate.
+        self._initialize_accumulated()
+        
         # A helper: build the graph of nodes (node -> list of downstream nodes) starting at self.start_node.
         # Also build a mapping: node -> set of upstream nodes.
         upstream = {}  # node -> set of immediate upstream nodes
