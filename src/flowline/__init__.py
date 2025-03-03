@@ -5,6 +5,7 @@ from .flow_pipes.motif_pipes import SampleMotifsFromPWMPipe, ProcessProvidedMoti
 from .flow_pipes.shuffle_pipes import NaiveShufflePipe, DiPairShufflePipe
 from .flow_pipes.injection_pipes import InjectMotifsIntoFastaRecordsPipe
 from .flow_pipes.utility_pipes import UnitAmountConverterPipe
+from .flow_base.flow_builder import build_flow
 
 __all__ = [
     # Base classes
@@ -33,5 +34,8 @@ __all__ = [
     "InjectMotifsIntoFastaRecordsPipe",
     
     # Utility pipes
-    "UnitAmountConverterPipe"
+    "UnitAmountConverterPipe",
+    
+    # Builder
+    "build_flow"
 ]

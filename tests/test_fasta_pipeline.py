@@ -1,7 +1,7 @@
 import os
 import sys
 import pytest
-from src.fasta_utils import load_fasta
+from flowline import LoadFastaPipe
 
 # Dummy FASTA content that does NOT contain the motif "GGGGGGGG".
 FASTA_CONTENT = """>seq1
@@ -68,6 +68,7 @@ def test_pipeline_select_mode(monkeypatch, tmp_path, temp_fasta_file, output_pat
         "--search-size", str(search_size),
         "--injection-rate", injection_rate,
         "--background-mode", "select",
+        "--background-size", str(background_size),
         "--output-search", output_search,
         "--output-background", output_background
     ]
@@ -76,8 +77,8 @@ def test_pipeline_select_mode(monkeypatch, tmp_path, temp_fasta_file, output_pat
     main()
 
     # Load output FASTA files.
-    search_records = load_fasta(output_search)
-    background_records = load_fasta(output_background)
+    search_records = LoadFastaPipe().execute({"fasta_file_path":output_search})["fasta_records"]
+    background_records = LoadFastaPipe().execute({"fasta_file_path":output_background})["fasta_records"]
 
     # Verify that the search set has exactly search_size records.
     assert len(search_records) == search_size
@@ -128,8 +129,8 @@ def test_pipeline_shuffle_mode(monkeypatch, tmp_path, temp_fasta_file, output_pa
     main()
 
     # Load output FASTA files.
-    search_records = load_fasta(output_search)
-    background_records = load_fasta(output_background)
+    search_records = LoadFastaPipe().execute({"fasta_file_path":output_search})["fasta_records"]
+    background_records = LoadFastaPipe().execute({"fasta_file_path":output_background})["fasta_records"]
 
     # Check that the search set contains exactly search_size records.
     assert len(search_records) == search_size
@@ -145,3 +146,4 @@ def test_pipeline_shuffle_mode(monkeypatch, tmp_path, temp_fasta_file, output_pa
     for rec in background_records:
         for ch in rec["seq"]:
             assert ch in "ACGT"
+            

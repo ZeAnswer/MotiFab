@@ -102,16 +102,17 @@ class FlowOutputFilter(FlowPipe):
 class FlowOutputRenamer(FlowPipe):
     """
     A specialized FlowPipe that renames outputs, ensuring only specified outputs are passed forward.
+    
     """
 
-    def __init__(self, output_map):
+    def __init__(self, output_mapping):
         """
         Initialize a FlowOutputRenamer.
 
         :param output_map: Dictionary mapping old output names to new output names.
         """
-        super().__init__(inputs=list(output_map.keys()), outputs=list(output_map.values()), action=self._rename_action)
-        self.output_map = output_map
+        super().__init__(inputs=list(output_mapping.keys()), outputs=list(output_mapping.values()), action=self._rename_action)
+        self.output_map = output_mapping
 
     def _rename_action(self, data):
         """

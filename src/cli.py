@@ -24,10 +24,10 @@ import argparse
 import random
 import sys
 
-from src.fasta_utils import load_fasta, write_fasta, select_random_sequences
-from src.motif import Motif
-from src.shuffle import shuffle_sequence
-from src.sequence_injector import inject_motif_into_records
+from flowline import (LoadFastaPipe, WriteFastaPipe, SelectRandomFastaSequencesPipe,
+                      GenerateRandomMotifsPipe, ProcessProvidedMotifPipe, ParsePWMPipe, SampleMotifsFromPWMPipe,
+                      NaiveShufflePipe, DiPairShufflePipe, InjectMotifsIntoFastaRecordsPipe,
+                      UnitAmountConverterPipe, build_flow, FlowOutputRenamer)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -127,68 +127,207 @@ def main():
         print("Dry run mode: no further action performed.")
         sys.exit(0) 
 
-    # Step 1: Load the input FASTA file.
+    # Build and run the flow
     try:
-        records = load_fasta(args.fasta)
+        run_flow(args)
     except Exception as e:
-        sys.exit(f"Error loading FASTA file: {e}")
+        sys.exit(f"Error: {e}")
 
-    if args.search_size > len(records):
-        sys.exit("Error: search-size exceeds the number of sequences in the input FASTA file.")
-
-    # Step 2: Select the search set.
-    search_set = select_random_sequences(records, args.search_size)
-
-    # Step 3: Generate the background set.
-    if args.background_mode == "select":
-        search_ids = {rec["id"] for rec in search_set}
-        background_candidates = [rec for rec in records if rec["id"] not in search_ids]
-        if len(background_candidates) < args.background_size:
-            background_set = background_candidates
-        else:
-            background_set = select_random_sequences(background_candidates, args.background_size)
-    elif args.background_mode == "shuffle":
-        # Generate background set by shuffling each record in the search set repeatedly until
-        # we have enough background sequences.
-        background_set = []
-        bg_counter = 1  # Initialize a counter for unique background IDs.
-        while len(background_set) < args.background_size:
-            for rec in search_set:
-                new_rec = rec.copy()
-                new_rec["seq"] = shuffle_sequence(rec["seq"], method=args.shuffle_method)
-                # Append a unique suffix to both the id and description.
-                new_rec["id"] = f"{new_rec['id']}_bg{bg_counter}"
-                new_rec["desc"] = f"{new_rec['desc']}_bg{bg_counter}"
-                bg_counter += 1
-                background_set.append(new_rec)
-                if len(background_set) >= args.background_size:
-                    break
-    else:
-        sys.exit("Unknown background mode.")
-
-    # Step 4: Generate the motif.
-    if args.motif_string:
-        motif_obj = Motif(args.motif_string, input_type="string")
-    elif args.motif_length is not None:
-        motif_obj = Motif(args.motif_length, input_type="length")
+def run_flow(args):
+    """
+    Build and run the MotiFab flow based on command-line arguments.
+    """
+    # Define flow configuration
+    flow_config = {}
+    
+    # Add the load FASTA pipe
+    flow_config['load_fasta'] = {
+        'type': LoadFastaPipe,
+        'init': {},
+        'upstream_pipes': {
+            '*': {'fasta_file_path': 'fasta_file_path'}
+        }
+    }
+    
+    # Add the search set selection pipe
+    flow_config['select_search'] = {
+        'type': SelectRandomFastaSequencesPipe,
+        'init': {},
+        'upstream_pipes': {
+            'load_fasta': {'fasta_records': 'fasta_records'},
+            '*': {'search_size': 'amount'}
+        }
+    }
+    
+    # Add motif generation based on input
+    if args.motif_length is not None:
+        # Random motif generation
+        flow_config['motif_generator'] = {
+            'type': GenerateRandomMotifsPipe,
+            'init': {
+                'amount': 1, 
+                'length': args.motif_length
+            },
+            'upstream_pipes': {}
+        }
+    elif args.motif_string:
+        # Process provided motif string
+        flow_config['motif_generator'] = {
+            'type': ProcessProvidedMotifPipe,
+            'init': {},
+            'upstream_pipes': {
+                '*': {'motif_string': 'motif_string'}
+            }
+        }
     elif args.motif_file:
-        motif_obj = Motif(args.motif_file, input_type="file")
-    else:
-        sys.exit("No motif option provided.")
-    motif_value = motif_obj.get_motif()
-
-    # Step 5: Inject the motif into the search set (using the sequence_injector module).
-    injected_search_set = inject_motif_into_records(search_set, motif_value, args.injection_rate)
-
-    # Step 6: Write the output FASTA files.
+        # PWM-based motif generation
+        flow_config['parse_pwm'] = {
+            'type': ParsePWMPipe,
+            'init': {},
+            'upstream_pipes': {
+                '*': {'pwm_file_path': 'pwm_file_path'}
+            }
+        }
+        flow_config['motif_generator'] = {
+            'type': SampleMotifsFromPWMPipe,
+            'init': {},
+            'upstream_pipes': {
+                'parse_pwm': {'pwm_matrix': 'pwm_matrix'},
+                'injection_converter': {'injection_rate': 'amount'}
+            }
+        }
+    
+    # Add injection converter pipe
+    flow_config['injection_converter'] = {
+        'type': UnitAmountConverterPipe,
+        'init': {},
+        'upstream_pipes': {
+            'select_search': {'fasta_records': 'items'},
+            '*': {'injection_rate': 'amount'}
+        }
+    }
+    
+    # Add motif injection pipe
+    flow_config['inject_motifs'] = {
+        'type': InjectMotifsIntoFastaRecordsPipe,
+        'init': {},
+        'upstream_pipes': {
+            'select_search': {'fasta_records': 'fasta_records'},
+            'motif_generator': {'motif_strings': 'motif_strings'},
+            'injection_converter': {'amount': 'amount'}
+        }
+    }
+    
+    # Add search set output pipe
+    flow_config['write_search'] = {
+        'type': WriteFastaPipe,
+        'init': {},
+        'upstream_pipes': {
+            'inject_motifs': {'fasta_records': 'fasta_records'},
+            '*': {'output_search_path': 'fasta_file_path'}
+        }
+    }
+    
+    # Add search set output renamer
+    flow_config['search_output_renamer'] = {
+        'type': FlowOutputRenamer,
+        'init': {'output_mapping': {'write_success': 'search_write_success'}},
+        'upstream_pipes': {'write_search': {'write_success': 'write_success'}}
+    }
+    
+    # Add background generation based on the selected mode
+    if args.background_mode == 'select':
+        # Selection mode: select from remaining FASTA records
+        flow_config['select_background'] = {
+            'type': SelectRandomFastaSequencesPipe,
+            'init': {},
+            'upstream_pipes': {
+                'load_fasta': {'fasta_records': 'fasta_records'},
+                'select_search': {'indices': 'excluded_indices'},
+                '*': {'background_size': 'amount'}
+            }
+        }
+        
+        # Background output pipe
+        flow_config['write_background'] = {
+            'type': WriteFastaPipe,
+            'init': {},
+            'upstream_pipes': {
+                'select_background': {'fasta_records': 'fasta_records'},
+                '*': {'output_background_path': 'fasta_file_path'}
+            }
+        }
+    else:  # 'shuffle' mode
+        # Use the appropriate shuffle method
+        shuffle_pipe_type = NaiveShufflePipe if args.shuffle_method == 'naive' else DiPairShufflePipe
+        
+        # Select from the search set for shuffling (can be greater than search size)
+        flow_config['select_background'] = {
+            'type': SelectRandomFastaSequencesPipe,
+            'init': {},
+            'upstream_pipes': {
+                'select_search': {'fasta_records': 'fasta_records'},
+                '*': {'background_size': 'amount'}
+            }
+        }
+        
+        # Shuffle pipe
+        flow_config['shuffle_search'] = {
+            'type': shuffle_pipe_type,
+            'init': {},
+            'upstream_pipes': {
+                'select_background': {'fasta_records': 'fasta_records'}
+            }
+        }
+           
+        # Background output pipe
+        flow_config['write_background'] = {
+            'type': WriteFastaPipe,
+            'init': {},
+            'upstream_pipes': {
+                'shuffle_search': {'fasta_records': 'fasta_records'},
+                '*': {'output_background_path': 'fasta_file_path'}
+            }
+        }
+    
+    # Add background output renamer
+    flow_config['background_output_renamer'] = {
+        'type': FlowOutputRenamer,
+        'init': {'output_mapping': {'write_success': 'background_write_success'}},
+        'upstream_pipes': {'write_background': {'write_success': 'write_success'}}
+    }
+        
+    
+    # Prepare external inputs
+    external_inputs = {
+        'fasta_file_path': args.fasta,
+        'search_size': args.search_size,
+        'background_size': args.background_size,
+        'injection_rate': args.injection_rate,
+        'output_search_path': args.output_search,
+        'output_background_path': args.output_background
+    }
+    
+    # Add any motif-specific inputs
+    if args.motif_string:
+        external_inputs['motif_string'] = args.motif_string
+    elif args.motif_file:
+        external_inputs['pwm_file_path'] = args.motif_file
+        
+    # Build the flow
+    manager, pipes = build_flow(flow_config)
+    
+    # Run the flow with external inputs
     try:
-        write_fasta(injected_search_set, args.output_search)
-        write_fasta(background_set, args.output_background)
+        manager.validate_flow()
+        result = manager.run(external_inputs)
+        
+        # Report success and output locations
+        print("Search set (test set) written to:", args.output_search)
+        print("Background set written to:", args.output_background)
+        
     except Exception as e:
-        sys.exit(f"Error writing output files: {e}")
-
-    print("Search set (test set) written to:", args.output_search)
-    print("Background set written to:", args.output_background)
+        raise RuntimeError(f"Flow execution failed: {e}")
 
 if __name__ == "__main__":
     main()

@@ -2,8 +2,7 @@ import pytest
 import sys
 import os
 import re
-from flowline import FlowPipe, FlowOutputFilter, FlowManager, FlowSource
-from flowline.flow_builder.flow_builder import build_flow
+from flowline import FlowPipe, FlowOutputFilter, FlowManager, FlowSource, build_flow
 
 # --- Helper functions to create FlowPipe instances with specific actions ---
 

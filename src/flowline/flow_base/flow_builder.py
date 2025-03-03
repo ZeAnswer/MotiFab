@@ -1,18 +1,6 @@
 from flowline import (
-    FlowPipe,
     FlowSource,
     FlowManager,
-    WriteFastaPipe,
-    LoadFastaPipe,
-    SelectRandomFastaSequencesPipe,
-    NaiveShufflePipe,
-    DiPairShufflePipe,
-    InjectMotifsIntoFastaRecordsPipe,
-    GenerateRandomMotifsPipe,
-    ProcessProvidedMotifPipe,
-    ParsePWMPipe,
-    SampleMotifsFromPWMPipe,
-    UnitAmountConverterPipe
 )
 
 def build_flow(pipe_config):
@@ -157,38 +145,3 @@ def build_flow(pipe_config):
         raise
     
     return manager, pipes
-
-# Example usage:
-if __name__ == "__main__":
-    # Define a simple flow
-    config = {
-        'random_motif': {
-            'type': GenerateRandomMotifsPipe,
-            'init': {'amount': 5, 'length': 10},
-            'upstream_pipes': {}  # No upstream dependencies, will be auto-connected to source
-        },
-        'inject_motifs': {
-            'type': InjectMotifsIntoFastaRecordsPipe,
-            'init': {},
-            'upstream_pipes': {
-                'random_motif': {'motif_strings': 'motif_strings'},  # Connect to random_motif
-                '*': {'fasta_records': 'fasta_records', 'amount': 'amount'}  # External inputs
-            }
-        },
-        'search_writer': {
-            'type': WriteFastaPipe,
-            'init': {},
-            'upstream_pipes': {
-                'inject_motifs': {'fasta_records': 'fasta_records'},  # Connect to inject_motifs
-                '*': {'output_path': 'fasta_file_path'}  # External input
-            }
-        }
-    }
-    
-    manager, pipes = build_flow(config)
-    print("\nFlow built successfully:")
-    for name, pipe in pipes.items():
-        if name == '*':
-            print(f"- {name}: Source node with {len(pipe.get_downstream())} downstream connections")
-        else:
-            print(f"- {name}: {pipe}")

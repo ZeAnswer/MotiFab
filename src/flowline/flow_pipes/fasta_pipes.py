@@ -131,12 +131,10 @@ class SelectRandomFastaSequencesPipe(FlowPipe):
         
         # Register which inputs have default values
         optional_inputs = []
+        optional_inputs.append("excluded_indices")
+        optional_inputs.append("mandatory_indices")
         if amount is not None:
             optional_inputs.append("amount")
-        if excluded_indices is not None:
-            optional_inputs.append("excluded_indices")
-        if mandatory_indices is not None:
-            optional_inputs.append("mandatory_indices")
         self.set_optional_inputs(optional_inputs)
 
     def select_random_sequences(self, data):
