@@ -86,9 +86,6 @@ def test_write_fasta_success(create_fasta_file):
     # Verify contents
     with open(TEST_OUTPUT_FASTA_FILE, "r") as f:
         written_content = f.read().strip()
-        print("@@@@")
-        print(written_content)
-        print(FASTA_CONTENT.strip())
         assert written_content == FASTA_CONTENT.strip()
 
     os.remove(TEST_OUTPUT_FASTA_FILE)

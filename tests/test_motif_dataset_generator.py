@@ -412,9 +412,6 @@ def test_cli_single_vs_sweep_mode(monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", single_args)
     generator_main()
     captured = capsys.readouterr()
-    print("@@@@@@@@")
-    print(captured.out)
-    print("@@@@@@@@")
     assert "Running in single dataset mode" in captured.out
     
     # Test sweep mode

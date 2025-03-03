@@ -37,9 +37,7 @@ class InjectMotifsIntoFastaRecordsPipe(FlowPipe):
 
         # Randomly select records to inject motifs into
         injection_indices = random.sample(range(num_records), injection_count)
-        print ("@@@@@@@@@@@", "injection_indices", injection_indices)
-        print ("@@@@@@@@@@@", "injection_count", injection_count)
-        print ("@@@@@@@@@@@", "num_records", num_records)
+        
         # Perform round-robin selection of motifs
         new_records = []
         motif_index = 0

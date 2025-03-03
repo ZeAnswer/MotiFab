@@ -26,7 +26,7 @@ Config File Usage:
   python src/motif_dataset_generator.py --config my_config.ini
   (Command line arguments override config file settings)
 """
-
+#TODO need to make sure that all args.something are okay and won't cause a crash. if we are not sure something exists, it must be checked first with hasattr(args, 'something')
 import os
 import sys
 import csv
@@ -75,7 +75,7 @@ def build_motif_dataset_flow(args):
     }
     
     # Add motif generation based on input
-    if args.motif_length is not None:
+    if hasattr(args, "motif_length") and args.motif_length is not None:
         # Random motif generation
         flow_config['motif_generator'] = {
             'type': GenerateRandomMotifsPipe,
@@ -85,7 +85,7 @@ def build_motif_dataset_flow(args):
             },
             'upstream_pipes': {}
         }
-    elif args.motif_string:
+    elif hasattr(args, "motif_string") and args.motif_string:
         # Process provided motif string
         flow_config['motif_generator'] = {
             'type': ProcessProvidedMotifPipe,
@@ -94,7 +94,7 @@ def build_motif_dataset_flow(args):
                 '*': {'motif_string': 'motif_string'}
             }
         }
-    elif args.motif_file:
+    elif hasattr(args, "motif_file") and args.motif_file:
         # PWM-based motif generation
         flow_config['parse_pwm'] = {
             'type': ParsePWMPipe,
@@ -151,7 +151,7 @@ def build_motif_dataset_flow(args):
     }
     
     # Add background generation based on the selected mode
-    if args.background_mode == 'select':
+    if hasattr(args, "background_mode") and args.background_mode == 'select':
         # Selection mode: select from remaining FASTA records
         flow_config['select_background'] = {
             'type': SelectRandomFastaSequencesPipe,
@@ -554,11 +554,11 @@ def parse_args():
         args.dry_run = False
     
     # Validate required arguments
-    if not args.fasta:
+    if not hasattr(args, 'fasta'):
         parser.error("No FASTA input file specified. Use --fasta or provide it in the config file.")
     
     # Ensure at least one motif option is provided
-    if not (args.motif_length or args.motif_string or args.motif_file):
+    if not hasattr(args, 'motif_length') and not hasattr(args, 'motif_string') and not hasattr(args, 'motif_file'):
         parser.error("No motif specification provided. Use one of --motif-length, --motif-string, or --motif-file.")
     
     return args
@@ -576,10 +576,12 @@ def determine_run_mode(args):
     """
     # Check if parameter sweep arguments are provided
     if hasattr(args, 'test_sizes') and args.test_sizes and hasattr(args, 'injection_rates') and args.injection_rates:
+        print("Running in parameter sweep mode")
         return 'sweep'
     
     # Check if single dataset arguments are provided
     if hasattr(args, 'search_size') and args.search_size and hasattr(args, 'injection_rate') and args.injection_rate:
+        print("Running in single dataset mode")
         return 'single'
     
     # Not enough arguments to determine the mode
@@ -600,11 +602,6 @@ def main():
             print(f"  {arg}: {value}")
     print()
     
-    # If dry-run is set, exit here
-    if args.dry_run:
-        print("Dry run mode: no datasets will be generated")
-        return 0
-    
     # Determine the run mode
     mode = determine_run_mode(args)
     
@@ -614,6 +611,11 @@ def main():
         print("For parameter sweep mode: --test-sizes and --injection-rates required")
         # Exit with error code 1 instead of returning
         sys.exit(1)
+    
+    # If dry-run is set, exit here
+    if hasattr(args, 'dry_run') and args.dry_run:
+        print("Dry run mode: no datasets will be generated")
+        return 0
     
     # Build the flow (do this only once)
     print(f"Building flow for {mode} mode...")
@@ -626,7 +628,6 @@ def main():
     
     # Execute based on the mode
     if mode == 'single':
-        print("Running in single dataset mode")
         
         # Create parameters for single dataset run
         dataset_params = {
@@ -639,16 +640,15 @@ def main():
         }
         
         # Add motif-specific parameters
-        if args.motif_string:
+        if hasattr(args, 'motif_string') and args.motif_string:
             dataset_params['motif_string'] = args.motif_string
-        elif args.motif_file:
+        elif hasattr(args, 'motif_file') and args.motif_file:
             dataset_params['pwm_file_path'] = args.motif_file
             
         # Run the flow
         result = run_dataset_generator(flow_manager, dataset_params)
         return 0 if result else 1
     else:
-        print("Running in parameter sweep mode")
         success = generate_multiple_datasets(flow_manager, args)
         return 0 if success else 1
 
