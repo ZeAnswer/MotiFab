@@ -33,6 +33,8 @@ import csv
 import argparse
 import random
 import configparser
+import shutil
+from pathlib import Path
 from itertools import product
 
 from flowline import (FlowManager, FlowSource, FlowPipe, FlowOutputFilter,
@@ -40,6 +42,35 @@ from flowline import (FlowManager, FlowSource, FlowPipe, FlowOutputFilter,
                       GenerateRandomMotifsPipe, ProcessProvidedMotifPipe, ParsePWMPipe, SampleMotifsFromPWMPipe,
                       NaiveShufflePipe, DiPairShufflePipe, InjectMotifsIntoFastaRecordsPipe,
                       UnitAmountConverterPipe, FlowOutputRenamer, build_flow)
+
+
+def copy_pwm_to_output_dir(pwm_file_path, output_dir):
+    """
+    Copy a PWM file to the output directory.
+    
+    Args:
+        pwm_file_path (str): Original path to the PWM file
+        output_dir (str): Directory to copy the PWM file to
+        
+    Returns:
+        str: Filename of the copied PWM file (without path)
+    """
+    if not os.path.isfile(pwm_file_path):
+        raise FileNotFoundError(f"PWM file not found: {pwm_file_path}")
+    
+    # Get just the filename without path
+    pwm_filename = os.path.basename(pwm_file_path)
+    
+    # Create the output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Destination path
+    dest_path = os.path.join(output_dir, pwm_filename)
+    
+    # Copy the file
+    shutil.copy2(pwm_file_path, dest_path)
+    
+    return pwm_filename
 
 
 def build_motif_dataset_flow(args):
@@ -98,10 +129,8 @@ def build_motif_dataset_flow(args):
         # PWM-based motif generation
         flow_config['parse_pwm'] = {
             'type': ParsePWMPipe,
-            'init': {},
-            'upstream_pipes': {
-                '*': {'pwm_file_path': 'pwm_file_path'}
-            }
+            'init': {'pwm_file_path': args.motif_file},
+            'upstream_pipes': {}
         }
         flow_config['motif_generator'] = {
             'type': SampleMotifsFromPWMPipe,
@@ -132,7 +161,6 @@ def build_motif_dataset_flow(args):
             'injection_converter': {'amount': 'amount'}
         }
     }
-    
     # Add search set output pipe
     flow_config['write_search'] = {
         'type': WriteFastaPipe,
@@ -271,6 +299,16 @@ def generate_multiple_datasets(flow_manager, args):
     os.makedirs(args.output_dir, exist_ok=True)
     summary_path = os.path.join(args.output_dir, args.summary_file)
     
+    # If using a PWM file, copy it to the output directory
+    pwm_filename = None
+    if hasattr(args, "motif_file") and args.motif_file:
+        try:
+            pwm_filename = copy_pwm_to_output_dir(args.motif_file, args.output_dir)
+            print(f"Copied PWM file to output directory: {pwm_filename}")
+        except Exception as e:
+            print(f"Error copying PWM file: {e}")
+            return False
+    
     # Create a summary CSV file
     with open(summary_path, 'w', newline='') as csvfile:
         fieldnames = [
@@ -281,32 +319,38 @@ def generate_multiple_datasets(flow_manager, args):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         
-        run_counter = 1
+        combination_id = 1
         success_count = 0
         total_count = len(test_sizes) * len(injection_rates) * args.replicates
         
         # Determine the motif description for the summary
-        if args.motif_string:
+        if hasattr(args, "motif_string") and args.motif_string:
             motif_description = args.motif_string
-        elif args.motif_length:
+        elif hasattr(args, "motif_length") and args.motif_length:
             motif_description = f"random_{args.motif_length}bp"
+        elif pwm_filename:
+            motif_description = pwm_filename
         else:
             motif_description = "from_file"
         
         # Iterate over all parameter combinations
         for test_size, injection_rate in product(test_sizes, injection_rates):
+            # For each parameter combination, use a new combination ID
             for replicate in range(1, args.replicates + 1):
                 # Create safe filename strings (replace % with pct)
                 rate_str = injection_rate.replace("%", "pct")
                 
+                # Create a two-level run ID (combination_id_replicate_id)
+                run_id = f"{combination_id}_{replicate}"
+                
                 # Generate filenames
-                search_filename = f"{args.prefix}_test_{test_size}_{rate_str}_run{replicate}.fasta"
-                bg_filename = f"{args.prefix}_background_{test_size}_{rate_str}_run{replicate}.fasta"
+                search_filename = f"{args.prefix}_test_{test_size}_{rate_str}_run_{run_id}.fasta"
+                bg_filename = f"{args.prefix}_background_{test_size}_{rate_str}_run_{run_id}.fasta"
                 output_search = os.path.join(args.output_dir, search_filename)
                 output_background = os.path.join(args.output_dir, bg_filename)
                 
-                print(f"\nGenerating dataset #{run_counter}/{total_count}:")
-                print(f"  Test size: {test_size}, Injection rate: {injection_rate}, Replicate: {replicate}")
+                print(f"\nGenerating dataset #{run_id} (Combination #{combination_id}, Replicate #{replicate}):")
+                print(f"  Test size: {test_size}, Injection rate: {injection_rate}")
                 
                 # Create parameters for this specific run
                 dataset_params = {
@@ -319,9 +363,9 @@ def generate_multiple_datasets(flow_manager, args):
                 }
                 
                 # Add motif-specific parameters
-                if args.motif_string:
+                if hasattr(args, "motif_string") and args.motif_string:
                     dataset_params['motif_string'] = args.motif_string
-                elif args.motif_file:
+                elif hasattr(args, "motif_file") and args.motif_file:
                     dataset_params['pwm_file_path'] = args.motif_file
                 
                 # Run the flow with these parameters
@@ -331,7 +375,7 @@ def generate_multiple_datasets(flow_manager, args):
                     success_count += 1
                     # Write to the summary CSV
                     writer.writerow({
-                        "run_id": run_counter,
+                        "run_id": run_id,
                         "test_size": test_size,
                         "injection_rate": injection_rate,
                         "motif": motif_description,
@@ -342,9 +386,11 @@ def generate_multiple_datasets(flow_manager, args):
                         "output_background": bg_filename
                     })
                 
-                run_counter += 1
                 # Explicitly flush the CSV file to ensure all rows are written
                 csvfile.flush()
+            
+            # Increment combination ID after all replicates of a combination are processed
+            combination_id += 1
     
     print(f"\nDataset generation complete: {success_count}/{total_count} successful")
     print(f"Summary written to: {summary_path}")
@@ -628,6 +674,18 @@ def main():
     
     # Execute based on the mode
     if mode == 'single':
+        # Create output directory if needed
+        output_dir = os.path.dirname(os.path.abspath(args.output_search))
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Copy PWM file if using one
+        if hasattr(args, 'motif_file') and args.motif_file:
+            try:
+                pwm_filename = copy_pwm_to_output_dir(args.motif_file, output_dir)
+                print(f"Copied PWM file to output directory: {pwm_filename}")
+            except Exception as e:
+                print(f"Error copying PWM file: {e}")
+                return 1
         
         # Create parameters for single dataset run
         dataset_params = {
@@ -647,8 +705,9 @@ def main():
             
         # Run the flow
         result = run_dataset_generator(flow_manager, dataset_params)
+        
         return 0 if result else 1
-    else:
+    else:  # parameter sweep mode
         success = generate_multiple_datasets(flow_manager, args)
         return 0 if success else 1
 

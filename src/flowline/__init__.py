@@ -1,11 +1,13 @@
-from .flow_base.flow_pipe import FlowOutputFilter, FlowPipe, FlowOutputRenamer, FlowSource
+from .flow_base.flow_pipe import FlowOutputFilter, FlowPipe, FlowOutputRenamer, FlowSource, FlowSubPipeline, FlowSplitJoinPipe # ,FlowMapPipe, FlowParallelPipe,
 from .flow_base.flow_manager import FlowManager
 from .flow_pipes.fasta_pipes import LoadFastaPipe, WriteFastaPipe, SelectRandomFastaSequencesPipe
 from .flow_pipes.motif_pipes import SampleMotifsFromPWMPipe, ProcessProvidedMotifPipe, GenerateRandomMotifsPipe, ParsePWMPipe
 from .flow_pipes.shuffle_pipes import NaiveShufflePipe, DiPairShufflePipe
 from .flow_pipes.injection_pipes import InjectMotifsIntoFastaRecordsPipe
-from .flow_pipes.utility_pipes import UnitAmountConverterPipe
+from .flow_pipes.utility_pipes import UnitAmountConverterPipe, CommandExecutorPipe
 from .flow_base.flow_builder import build_flow
+from .flow_pipes.enrichment_pipes import BatchJobExecutorPipe, SlurmJobGeneratorPipe, MemeCommandGeneratorPipe, JobExecutorPipe, HomerCommandGeneratorPipe
+from .flow_pipes.motif_detection_pipes import MotifLocalAlignmentPipe, PWMComparisonPipe,  StringToOneShotPWMPipe, MemeXmlParserPipe, HomerTextParserPipe, MotifSummaryPipe
 
 __all__ = [
     # Base classes
@@ -14,6 +16,10 @@ __all__ = [
     "FlowOutputFilter", 
     "FlowOutputRenamer", 
     "FlowSource",
+    "FlowSubPipeline",
+    #"FlowMapPipe",
+    #"FlowParallelPipe",
+    "FlowSplitJoinPipe",
     
     # Fasta pipes
     "LoadFastaPipe", 
@@ -35,6 +41,22 @@ __all__ = [
     
     # Utility pipes
     "UnitAmountConverterPipe",
+    "CommandExecutorPipe",
+    
+    # Enrichment pipes
+    "BatchJobExecutorPipe",
+    "SlurmJobGeneratorPipe",
+    "MemeCommandGeneratorPipe",
+    "JobExecutorPipe",
+    "HomerCommandGeneratorPipe",
+    
+    # Motif detection pipes
+    "MemeXmlParserPipe",
+    "HomerTextParserPipe",
+    "MotifLocalAlignmentPipe",
+    "PWMComparisonPipe",
+    "StringToOneShotPWMPipe",
+    "MotifSummaryPipe",
     
     # Builder
     "build_flow"

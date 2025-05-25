@@ -1,8 +1,10 @@
 import pytest
 import sys
 import os
+import itertools
+import multiprocessing as mp
 import re
-from flowline import FlowPipe, FlowOutputFilter, FlowManager, FlowSource, build_flow
+from flowline import FlowPipe, FlowOutputFilter, FlowManager, FlowSource, FlowSubPipeline, FlowSplitJoinPipe, build_flow#, FlowMapPipe
 
 # --- Helper functions to create FlowPipe instances with specific actions ---
 
@@ -308,3 +310,273 @@ def test_flow_builder_with_complex_flow():
     assert pipes['multiply_even'] in pipes['filter_even'].get_downstream()
     assert pipes['combine_results'] in pipes['multiply_odd'].get_downstream()
     assert pipes['combine_results'] in pipes['multiply_even'].get_downstream()
+
+# --- Tests for FlowSubPipeline ---
+def test_flow_sub_pipeline_simple():
+    """Test that a simple sub-pipeline works correctly."""
+    # Create a simple sub-pipeline
+    sub_start = FlowPipe(inputs=["sub_input"], outputs=["intermediate"], action=lambda d: {"intermediate": d["sub_input"] * 2})
+    sub_end = FlowPipe(inputs=["intermediate"], outputs=["sub_output"], action=lambda d: {"sub_output": d["intermediate"] + 1})
+    sub_start.add_downstream(sub_end)
+    
+    sub_manager = FlowManager(sub_start)
+    
+    # Create a main pipeline with the sub-pipeline as a component
+    sub_pipe = FlowSubPipeline(sub_manager, inputs=["sub_input"], outputs=["sub_output"])
+    
+    # Test directly
+    result = sub_pipe.execute({"sub_input": 5})
+    assert result["sub_output"] == 11  # 5 * 2 + 1 = 11
+    
+    # Test in a full pipeline
+    start = FlowPipe(inputs=[], outputs=["value"], action=lambda _: {"value": 3})
+    start.add_downstream(sub_pipe, outputMapping={"value": "sub_input"})
+    
+    main_manager = FlowManager(start)
+    result = main_manager.run()
+    
+    assert result["sub_output"] == 7  # 3 * 2 + 1 = 7
+
+def test_flow_sub_pipeline_with_multiple_outputs():
+    """Test that a sub-pipeline with multiple outputs works correctly."""
+    # Create a sub-pipeline with multiple outputs
+    sub_pipe = FlowPipe(
+        inputs=["input"], 
+        outputs=["squared", "cubed"], 
+        action=lambda d: {"squared": d["input"]**2, "cubed": d["input"]**3}
+    )
+    
+    sub_manager = FlowManager(sub_pipe)
+    
+    # Create a main pipeline with the sub-pipeline
+    sub_component = FlowSubPipeline(
+        sub_manager, 
+        inputs=["input"], 
+        outputs=["square_result", "cube_result"],
+        output_mapping={"squared": "square_result", "cubed": "cube_result"}
+    )
+    
+    # Test directly
+    result = sub_component.execute({"input": 4})
+    assert result["square_result"] == 16  # 4^2 = 16
+    assert result["cube_result"] == 64    # 4^3 = 64
+    
+# # --- Tests for FlowMapPipe ---
+
+# def test_flow_map_pipe_simple():
+#     """Test that a simple map operation works correctly."""
+#     # Create a mapping pipe that doubles its input
+#     double_pipe = FlowPipe(inputs=["x"], outputs=["y"], action=lambda d: {"y": d["x"] * 2})
+    
+#     # Create a map pipe that applies the double_pipe to each element
+#     map_pipe = FlowMapPipe(double_pipe)
+    
+#     # Test directly
+#     result = map_pipe.execute({"x": [1, 2, 3, 4, 5]})
+#     assert result["y"] == [2, 4, 6, 8, 10]
+
+# def test_flow_map_pipe_with_custom_names():
+#     """Test that a map pipe with custom input/output names works correctly."""
+#     # Create a mapping pipe that squares its input
+#     square_pipe = FlowPipe(inputs=["num"], outputs=["squared"], action=lambda d: {"squared": d["num"]**2})
+    
+#     # Create a map pipe with custom input/output names
+#     map_pipe = FlowMapPipe(square_pipe, input_name="numbers", output_name="squared_numbers")
+    
+#     # Test directly
+#     result = map_pipe.execute({"numbers": [1, 2, 3, 4]})
+#     assert result["squared_numbers"] == [1, 4, 9, 16]
+    
+#     # Test in a full pipeline
+#     start = FlowPipe(inputs=[], outputs=["values"], action=lambda _: {"values": [5, 6, 7]})
+#     end = FlowPipe(inputs=["squared_values"], outputs=["sum"], action=lambda d: {"sum": sum(d["squared_values"])})
+    
+#     start.add_downstream(map_pipe, outputMapping={"values": "numbers"})
+#     map_pipe.add_downstream(end, outputMapping={"squared_numbers": "squared_values"})
+    
+#     manager = FlowManager(start)
+#     result = manager.run()
+    
+#     assert result["sum"] == 110  # 5^2 + 6^2 + 7^2 = 25 + 36 + 49 = 110
+
+# def test_flow_map_pipe_validation():
+#     """Test that the map pipe properly validates the mapping pipe."""
+#     # Test with a pipe that has multiple inputs
+#     invalid_pipe1 = FlowPipe(inputs=["a", "b"], outputs=["c"], action=lambda d: {"c": d["a"] + d["b"]})
+#     with pytest.raises(ValueError, match="map_pipe must have exactly one input"):
+#         FlowMapPipe(invalid_pipe1)
+    
+#     # Test with a pipe that has multiple outputs
+#     invalid_pipe2 = FlowPipe(inputs=["a"], outputs=["b", "c"], action=lambda d: {"b": d["a"], "c": d["a"] * 2})
+#     with pytest.raises(ValueError, match="map_pipe must have exactly one output"):
+#         FlowMapPipe(invalid_pipe2)
+    
+#     # Test with a non-pipe object
+#     with pytest.raises(TypeError, match="map_pipe must be a FlowPipe instance"):
+#         FlowMapPipe("not a pipe")
+
+# def test_flow_map_pipe_input_validation():
+#     """Test that the map pipe properly validates its input at execution time."""
+#     # Create a valid mapping pipe
+#     identity_pipe = FlowPipe(inputs=["x"], outputs=["y"], action=lambda d: {"y": d["x"]})
+#     map_pipe = FlowMapPipe(identity_pipe)
+    
+#     # Test with a non-list input
+#     with pytest.raises(ValueError, match="must be a list"):
+#         map_pipe.execute({"x": "not a list"})
+    
+#     # Test with missing input
+#     with pytest.raises(ValueError, match="not found in data"):
+#         map_pipe.execute({"wrong_name": [1, 2, 3]})
+        
+# --- Helper Functions for Inner Pipe Actions ---
+
+def add_and_subtract_action(data):
+    """Takes inputs 'X' and 'Y' and returns their sum and difference."""
+    x = data["X"]
+    y = data["Y"]
+    return {"sum": x + y, "diff": x - y}
+
+def make_pair_action(data):
+    """Returns a tuple (A, B) from inputs 'A' and 'B'."""
+    return {"pair": (data["A"], data["B"])}
+
+def add_const_action(data):
+    """Adds a scalar 'const' to the input 'X'."""
+    return {"result": data["X"] + data["const"]}
+
+def square_action(data):
+    """Squares the number provided in 'num'."""
+    return {"squared": data["num"] ** 2}
+
+# --- Test Cases for FlowSplitJoinPipe ---
+
+def test_flow_split_join_zip():
+    """
+    Test zipped iteration when both inputs are mapped to the same index.
+    Inputs 'X' and 'Y' are zipped together.
+    """
+    # Inner pipe takes two inputs and produces two outputs.
+    inner_pipe = FlowPipe(
+        inputs=["X", "Y"],
+        outputs=["sum", "diff"],
+        action=add_and_subtract_action
+    )
+    # Both inputs use the same index label, so they are zipped.
+    input_mapping = {"X": "i", "Y": "i"}
+    sj_pipe = FlowSplitJoinPipe(inner_pipe, input_mapping=input_mapping, max_parallel=0)
+    
+    data = {"X": [1, 2, 3], "Y": [4, 5, 6]}
+    result = sj_pipe.execute(data)
+    
+    expected_arr_output = [
+        {"sum": 5, "diff": -3},
+        {"sum": 7, "diff": -3},
+        {"sum": 9, "diff": -3}
+    ]
+    # Check aggregated outputs as well.
+    assert result["arr_output"] == expected_arr_output
+    assert result["sum"] == [5, 7, 9]
+    assert result["diff"] == [-3, -3, -3]
+
+def test_flow_split_join_cartesian():
+    """
+    Test Cartesian iteration when inputs have different index labels.
+    Input 'A' is iterated with label "i" and 'B' with label "j", producing the full product.
+    """
+    inner_pipe = FlowPipe(
+        inputs=["A", "B"],
+        outputs=["pair"],
+        action=make_pair_action
+    )
+    # 'A' and 'B' use different index labels: Cartesian product.
+    input_mapping = {"A": "i", "B": "j"}
+    sj_pipe = FlowSplitJoinPipe(inner_pipe, input_mapping=input_mapping, max_parallel=0)
+    
+    data = {"A": [1, 2], "B": [10, 20, 30]}
+    result = sj_pipe.execute(data)
+    
+    expected_arr_output = [
+        {"pair": (1, 10)},
+        {"pair": (1, 20)},
+        {"pair": (1, 30)},
+        {"pair": (2, 10)},
+        {"pair": (2, 20)},
+        {"pair": (2, 30)}
+    ]
+    assert result["arr_output"] == expected_arr_output
+    # Also check the aggregated output.
+    expected_pairs = [(1, 10), (1, 20), (1, 30), (2, 10), (2, 20), (2, 30)]
+    assert result["pair"] == expected_pairs
+
+def test_flow_split_join_scalar_input():
+    """
+    Test that scalar inputs (without an index mapping) are passed unchanged.
+    'X' is iterated (mapped to "i") and 'const' is scalar.
+    """
+    inner_pipe = FlowPipe(
+        inputs=["X", "const"],
+        outputs=["result"],
+        action=add_const_action
+    )
+    # Only 'X' is split; 'const' remains constant.
+    input_mapping = {"X": "i", "const": None}
+    sj_pipe = FlowSplitJoinPipe(inner_pipe, input_mapping=input_mapping, max_parallel=0)
+    
+    data = {"X": [10, 20, 30], "const": 5}
+    result = sj_pipe.execute(data)
+    
+    expected_arr_output = [
+        {"result": 15},
+        {"result": 25},
+        {"result": 35}
+    ]
+    assert result["arr_output"] == expected_arr_output
+    assert result["result"] == [15, 25, 35]
+
+def test_flow_split_join_parallel_execution():
+    """
+    Test parallel execution by setting max_parallel > 0.
+    Uses a simple inner pipe that squares its input.
+    """
+    inner_pipe = FlowPipe(
+        inputs=["num"],
+        outputs=["squared"],
+        action=square_action
+    )
+    input_mapping = {"num": "i"}
+    sj_pipe = FlowSplitJoinPipe(inner_pipe, input_mapping=input_mapping, max_parallel=2)
+    
+    data = {"num": [1, 2, 3, 4, 5, 6]}
+    result = sj_pipe.execute(data)
+    
+    expected_arr_output = [
+        {"squared": 1},
+        {"squared": 4},
+        {"squared": 9},
+        {"squared": 16},
+        {"squared": 25},
+        {"squared": 36}
+    ]
+    assert result["arr_output"] == expected_arr_output
+    assert result["squared"] == [1, 4, 9, 16, 25, 36]
+
+def test_flow_split_join_invalid_list_length():
+    """
+    Test that an error is raised if inputs mapped to the same index have mismatched lengths.
+    """
+    def dummy_action(data):
+        return {"out": data["A"]}
+    
+    inner_pipe = FlowPipe(
+        inputs=["A", "B"],
+        outputs=["out"],
+        action=dummy_action
+    )
+    # Both 'A' and 'B' are zipped together, so their lists must be the same length.
+    input_mapping = {"A": "i", "B": "i"}
+    sj_pipe = FlowSplitJoinPipe(inner_pipe, input_mapping=input_mapping, max_parallel=0)
+    
+    data = {"A": [1, 2, 3], "B": [4, 5]}  # Mismatched lengths.
+    with pytest.raises(ValueError, match="differing lengths"):
+        sj_pipe.execute(data)

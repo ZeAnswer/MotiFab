@@ -62,9 +62,6 @@ class ParsePWMPipe(FlowPipe):
     """
     FlowPipe to parse a Position Weight Matrix (PWM) file.
 
-    Inputs:
-        - "pwm_file_path" (str): Path to the PWM file.
-
     Outputs:
         - "pwm_matrix" (dict): A dictionary containing nucleotide probabilities:
             - Keys: "A", "C", "G", "T"
@@ -75,11 +72,12 @@ class ParsePWMPipe(FlowPipe):
         - ValueError if the file format is incorrect or the matrix is invalid.
     """
 
-    def __init__(self):
-        super().__init__(inputs=["pwm_file_path"], outputs=["pwm_matrix"], action=self.parse_pwm_file)
+    def __init__(self, pwm_file_path):
+        self.pwm_file_path = pwm_file_path
+        super().__init__(outputs=["pwm_matrix"], action=self.parse_pwm_file)
 
     def parse_pwm_file(self, data):
-        file_path = data["pwm_file_path"]
+        file_path = self.pwm_file_path
         try:
             with open(file_path, 'r') as f:
                 raw_lines = f.readlines()

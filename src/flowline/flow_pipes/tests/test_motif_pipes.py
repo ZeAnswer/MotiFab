@@ -102,8 +102,8 @@ def test_generate_random_motifs_with_defaults():
 def test_parse_pwm_success(tmp_path, test_pwm_content):
     """Test parsing a valid PWM file."""
     pwm_file_path = create_test_pwm_file(tmp_path, test_pwm_content)
-    pipe = ParsePWMPipe()
-    data = {"pwm_file_path": pwm_file_path}
+    pipe = ParsePWMPipe(pwm_file_path)
+    data = {}
     result = pipe.execute(data)
 
     assert "pwm_matrix" in result
@@ -113,8 +113,8 @@ def test_parse_pwm_success(tmp_path, test_pwm_content):
 
 def test_parse_pwm_missing_file():
     """Test parsing a missing PWM file (should raise FileNotFoundError)."""
-    pipe = ParsePWMPipe()
-    data = {"pwm_file_path": "non_existent_pwm.txt"}
+    pipe = ParsePWMPipe("non_existent_pwm.txt")
+    data = {}
 
     with pytest.raises(FileNotFoundError, match="PWM file not found"):
         pipe.execute(data)
@@ -124,8 +124,8 @@ def test_parse_pwm_invalid_format(tmp_path):
     invalid_pwm_content = "#This is an invalid PWM\n0.2 0.3 0.5\n"
     pwm_file_path = create_test_pwm_file(tmp_path, invalid_pwm_content)
 
-    pipe = ParsePWMPipe()
-    data = {"pwm_file_path": pwm_file_path}
+    pipe = ParsePWMPipe(pwm_file_path)
+    data = {}
 
     with pytest.raises(ValueError, match="PWM file does not start with the required header"):
         pipe.execute(data)
@@ -139,8 +139,8 @@ def test_sample_multiple_motifs_from_pwm(tmp_path, test_pwm_content):
     pwm_file_path = create_test_pwm_file(tmp_path, test_pwm_content)
 
     # Parse PWM first
-    parse_pipe = ParsePWMPipe()
-    pwm_data = parse_pipe.execute({"pwm_file_path": pwm_file_path})
+    parse_pipe = ParsePWMPipe(pwm_file_path)
+    pwm_data = parse_pipe.execute({})
 
     # Sample multiple motifs from parsed PWM
     sample_pipe = SampleMotifsFromPWMPipe()
@@ -174,8 +174,8 @@ def test_sample_motif_from_pwm_invalid_amount(tmp_path, test_pwm_content):
     pwm_file_path = create_test_pwm_file(tmp_path, test_pwm_content)
 
     # Parse PWM first
-    parse_pipe = ParsePWMPipe()
-    pwm_data = parse_pipe.execute({"pwm_file_path": pwm_file_path})
+    parse_pipe = ParsePWMPipe(pwm_file_path)
+    pwm_data = parse_pipe.execute({})
 
     sample_pipe = SampleMotifsFromPWMPipe()
 
