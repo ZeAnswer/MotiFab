@@ -21,3 +21,4 @@ logs/*
 *.motif*
 *.svg
 *.pwm
+*.group
