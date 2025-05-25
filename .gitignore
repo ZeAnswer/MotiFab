@@ -22,3 +22,5 @@ logs/*
 *.svg
 *.pwm
 *.group
+.DS_Store
+.*.py
