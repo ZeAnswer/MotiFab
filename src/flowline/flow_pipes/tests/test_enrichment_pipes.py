@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
-from flowline import MemeCommandGeneratorPipe, SlurmJobGeneratorPipe, FlowSplitJoinPipe#, FlowParallelPipe
+from flowline import MemeCommandGeneratorPipe, FlowSplitJoinPipe#, FlowParallelPipe, SlurmJobGeneratorPipe
 from flowline.flow_pipes.enrichment_pipes import BatchJobExecutorPipe, JobExecutorPipe, HomerCommandGeneratorPipe
 
 # Test data
@@ -648,116 +648,116 @@ def test_homer_command_generator_strand(test_fasta_files, temp_output_dir):
 
 # --- SlurmJobGeneratorPipe Tests ---
 
-def test_slurm_job_generator_basic(test_fasta_files, temp_output_dir):
-    """Test basic SLURM job script generation."""
-    test_path, bg_path = test_fasta_files
+# def test_slurm_job_generator_basic(test_fasta_files, temp_output_dir):
+#     """Test basic SLURM job script generation."""
+#     test_path, bg_path = test_fasta_files
     
-    # First generate MEME command
-    meme_pipe = MemeCommandGeneratorPipe(output_dir_prefix=temp_output_dir)
-    meme_data = {
-        "summary_record": {
-            "test_fasta_path": test_path,
-            "background_fasta_path": bg_path,
-            "run_id": "slurm_test"
-        }
-    }
-    meme_result = meme_pipe.execute(meme_data)
+#     # First generate MEME command
+#     meme_pipe = MemeCommandGeneratorPipe(output_dir_prefix=temp_output_dir)
+#     meme_data = {
+#         "summary_record": {
+#             "test_fasta_path": test_path,
+#             "background_fasta_path": bg_path,
+#             "run_id": "slurm_test"
+#         }
+#     }
+#     meme_result = meme_pipe.execute(meme_data)
     
-    # Now generate SLURM job script
-    slurm_pipe = SlurmJobGeneratorPipe(module_name="meme-5.4.1", job_name="test_job")
-    data = {
-        "command": meme_result["command"],
-        "output_dir": meme_result["output_dir"]
-    }
+#     # Now generate SLURM job script
+#     slurm_pipe = SlurmJobGeneratorPipe(module_name="meme-5.4.1", job_name="test_job")
+#     data = {
+#         "command": meme_result["command"],
+#         "output_dir": meme_result["output_dir"]
+#     }
     
-    result = slurm_pipe.execute(data)
+#     result = slurm_pipe.execute(data)
     
-    # Check outputs
-    assert "job_script" in result
-    assert os.path.exists(result["job_script"])
+#     # Check outputs
+#     assert "job_script" in result
+#     assert os.path.exists(result["job_script"])
     
-    # Check script content
-    job_script_path = result["job_script"]
-    with open(job_script_path, "r") as f:
-        content = f.read()
-        assert "#!/bin/bash" in content
-        assert "#SBATCH --job-name=test_job" in content
-        assert "#SBATCH --time=4:00:00" in content  # Default value
-        assert "#SBATCH --mem=16GB" in content  # Default value
-        assert "#SBATCH --cpus-per-task=4" in content  # Default value
-        assert "module load meme-5.4.1" in content
-        assert meme_result["command"] in content
+#     # Check script content
+#     job_script_path = result["job_script"]
+#     with open(job_script_path, "r") as f:
+#         content = f.read()
+#         assert "#!/bin/bash" in content
+#         assert "#SBATCH --job-name=test_job" in content
+#         assert "#SBATCH --time=4:00:00" in content  # Default value
+#         assert "#SBATCH --mem=16GB" in content  # Default value
+#         assert "#SBATCH --cpus-per-task=4" in content  # Default value
+#         assert "module load meme-5.4.1" in content
+#         assert meme_result["command"] in content
 
-def test_slurm_job_generator_custom_params(test_fasta_files, temp_output_dir):
-    """Test SLURM job script generation with custom parameters."""
-    test_path, bg_path = test_fasta_files
+# def test_slurm_job_generator_custom_params(test_fasta_files, temp_output_dir):
+#     """Test SLURM job script generation with custom parameters."""
+#     test_path, bg_path = test_fasta_files
     
-    # Generate MEME command
-    meme_pipe = MemeCommandGeneratorPipe(output_dir_prefix=temp_output_dir)
-    meme_data = {
-        "summary_record": {
-            "test_fasta_path": test_path,
-            "background_fasta_path": bg_path,
-            "run_id": "custom_slurm"
-        }
-    }
-    meme_result = meme_pipe.execute(meme_data)
+#     # Generate MEME command
+#     meme_pipe = MemeCommandGeneratorPipe(output_dir_prefix=temp_output_dir)
+#     meme_data = {
+#         "summary_record": {
+#             "test_fasta_path": test_path,
+#             "background_fasta_path": bg_path,
+#             "run_id": "custom_slurm"
+#         }
+#     }
+#     meme_result = meme_pipe.execute(meme_data)
     
-    # Generate SLURM job script with custom parameters
-    custom_slurm_params = {
-        "time": "12:00:00",
-        "mem": "32GB",
-        "cpus_per_task": 8,
-        "partition": "high-priority"
-    }
+#     # Generate SLURM job script with custom parameters
+#     custom_slurm_params = {
+#         "time": "12:00:00",
+#         "mem": "32GB",
+#         "cpus_per_task": 8,
+#         "partition": "high-priority"
+#     }
     
-    slurm_pipe = SlurmJobGeneratorPipe(
-        job_name="custom_job",
-        module_name="meme-5.5.7",
-        slurm_params=custom_slurm_params
-    )
+#     slurm_pipe = SlurmJobGeneratorPipe(
+#         job_name="custom_job",
+#         module_name="meme-5.5.7",
+#         slurm_params=custom_slurm_params
+#     )
     
-    data = {
-        "command": meme_result["command"],
-        "output_dir": meme_result["output_dir"]
-    }
+#     data = {
+#         "command": meme_result["command"],
+#         "output_dir": meme_result["output_dir"]
+#     }
     
-    result = slurm_pipe.execute(data)
+#     result = slurm_pipe.execute(data)
     
-    # Check script content with custom params
-    job_script_path = result["job_script"]
-    with open(job_script_path, "r") as f:
-        content = f.read()
-        assert "#SBATCH --job-name=custom_job" in content
-        assert "#SBATCH --time=12:00:00" in content
-        assert "#SBATCH --mem=32GB" in content
-        assert "#SBATCH --cpus-per-task=8" in content
-        assert "#SBATCH --partition=high-priority" in content
-        assert "module load meme-5.5.7" in content
+#     # Check script content with custom params
+#     job_script_path = result["job_script"]
+#     with open(job_script_path, "r") as f:
+#         content = f.read()
+#         assert "#SBATCH --job-name=custom_job" in content
+#         assert "#SBATCH --time=12:00:00" in content
+#         assert "#SBATCH --mem=32GB" in content
+#         assert "#SBATCH --cpus-per-task=8" in content
+#         assert "#SBATCH --partition=high-priority" in content
+#         assert "module load meme-5.5.7" in content
 
-def test_slurm_job_generator_missing_input(temp_output_dir):
-    """Test that errors are raised when required inputs are missing."""
-    slurm_pipe = SlurmJobGeneratorPipe(module_name="meme-5.4.1")
+# def test_slurm_job_generator_missing_input(temp_output_dir):
+#     """Test that errors are raised when required inputs are missing."""
+#     slurm_pipe = SlurmJobGeneratorPipe(module_name="meme-5.4.1")
     
-    # Missing command
-    with pytest.raises(ValueError, match="Missing required input: command"):
-        slurm_pipe.execute({
-            "output_dir": temp_output_dir
-        })
+#     # Missing command
+#     with pytest.raises(ValueError, match="Missing required input: command"):
+#         slurm_pipe.execute({
+#             "output_dir": temp_output_dir
+#         })
     
-    # Missing output_dir
-    with pytest.raises(ValueError, match="Missing required input: output_dir"):
-        slurm_pipe.execute({
-            "command": "meme test.fa"
-        })
+#     # Missing output_dir
+#     with pytest.raises(ValueError, match="Missing required input: output_dir"):
+#         slurm_pipe.execute({
+#             "command": "meme test.fa"
+#         })
     
-    # Missing module_name (during initialization)
-    with pytest.raises(ValueError, match="Module name must be provided during initialization"):
-        slurm_pipe = SlurmJobGeneratorPipe()  # No module_name
-        slurm_pipe.execute({
-            "command": "meme test.fa",
-            "output_dir": temp_output_dir
-        })
+#     # Missing module_name (during initialization)
+#     with pytest.raises(ValueError, match="Module name must be provided during initialization"):
+#         slurm_pipe = SlurmJobGeneratorPipe()  # No module_name
+#         slurm_pipe.execute({
+#             "command": "meme test.fa",
+#             "output_dir": temp_output_dir
+#         })
 
 # --- JobExecutorPipe Tests ---
 
@@ -974,86 +974,86 @@ def test_parallel_job_execution(temp_output_dir):
             for status in result["status"]:
                 assert status == "COMPLETED"
 
-def test_parallel_job_execution_integration(test_fasta_files, temp_output_dir):
-    """Test integration of MEME command generation, SLURM job script creation, and parallel execution."""
-    test_path, bg_path = test_fasta_files
+# def test_parallel_job_execution_integration(test_fasta_files, temp_output_dir):
+    # """Test integration of MEME command generation, SLURM job script creation, and parallel execution."""
+    # test_path, bg_path = test_fasta_files
     
-    # Create a FlowSplitJoinPipe for MEME command generation
-    meme_pipe = MemeCommandGeneratorPipe(output_dir_prefix=temp_output_dir)
+    # # Create a FlowSplitJoinPipe for MEME command generation
+    # meme_pipe = MemeCommandGeneratorPipe(output_dir_prefix=temp_output_dir)
     
-    # Create test data for three different runs
-    test_data = [
-        {
-            "summary_record": {
-                "test_fasta_path": test_path,
-                "background_fasta_path": bg_path,
-                "run_id": f"test_run_{i}"
-            }
-        }
-        for i in range(3)
-    ]
+    # # Create test data for three different runs
+    # test_data = [
+    #     {
+    #         "summary_record": {
+    #             "test_fasta_path": test_path,
+    #             "background_fasta_path": bg_path,
+    #             "run_id": f"test_run_{i}"
+    #         }
+    #     }
+    #     for i in range(3)
+    # ]
     
-    # Process each test configuration and collect MEME results
-    meme_results = []
-    for data in test_data:
-        meme_result = meme_pipe.execute(data)
-        meme_results.append(meme_result)
+    # # Process each test configuration and collect MEME results
+    # meme_results = []
+    # for data in test_data:
+    #     meme_result = meme_pipe.execute(data)
+    #     meme_results.append(meme_result)
     
-    # Create SLURM job scripts using the individual results
-    slurm_pipe = SlurmJobGeneratorPipe(module_name="meme-5.4.1", job_name="test_job")
-    job_scripts = []
+    # # Create SLURM job scripts using the individual results
+    # slurm_pipe = SlurmJobGeneratorPipe(module_name="meme-5.4.1", job_name="test_job")
+    # job_scripts = []
     
-    for meme_result in meme_results:
-        slurm_data = {
-            "command": meme_result["command"],
-            "output_dir": meme_result["output_dir"]
-        }
-        slurm_result = slurm_pipe.execute(slurm_data)
-        job_scripts.append(slurm_result["job_script"])
+    # for meme_result in meme_results:
+    #     slurm_data = {
+    #         "command": meme_result["command"],
+    #         "output_dir": meme_result["output_dir"]
+    #     }
+    #     slurm_result = slurm_pipe.execute(slurm_data)
+    #     job_scripts.append(slurm_result["job_script"])
     
-    # Mock for job submission and status checking
-    def mock_side_effect(*args, **kwargs):
-        if args[0][0] == "sbatch":
-            mock_process = MagicMock()
-            script_path = args[0][1]
-            for i, result in enumerate(meme_results):
-                if result["output_dir"] in script_path:
-                    job_id = f"2000{i}"
-                    break
-            else:
-                job_id = "20000"  # Default if not found
-            mock_process.stdout = f"Submitted batch job {job_id}"
-            mock_process.stderr = ""
-            return mock_process
-        elif args[0][0] == "sacct":
-            mock_process = MagicMock()
-            job_id = args[0][2]
-            mock_process.stdout = f"{job_id}|COMPLETED|0:0\n"
-            mock_process.stderr = ""
-            return mock_process
+    # # Mock for job submission and status checking
+    # def mock_side_effect(*args, **kwargs):
+    #     if args[0][0] == "sbatch":
+    #         mock_process = MagicMock()
+    #         script_path = args[0][1]
+    #         for i, result in enumerate(meme_results):
+    #             if result["output_dir"] in script_path:
+    #                 job_id = f"2000{i}"
+    #                 break
+    #         else:
+    #             job_id = "20000"  # Default if not found
+    #         mock_process.stdout = f"Submitted batch job {job_id}"
+    #         mock_process.stderr = ""
+    #         return mock_process
+    #     elif args[0][0] == "sacct":
+    #         mock_process = MagicMock()
+    #         job_id = args[0][2]
+    #         mock_process.stdout = f"{job_id}|COMPLETED|0:0\n"
+    #         mock_process.stderr = ""
+    #         return mock_process
     
-    # Setup the test with mocking
-    with patch("subprocess.run", side_effect=mock_side_effect):
-        with patch("time.sleep", return_value=None):  # Skip sleep
-            # Create a job executor pipe
-            job_executor = JobExecutorPipe(wait_for_completion=True)
+    # # Setup the test with mocking
+    # with patch("subprocess.run", side_effect=mock_side_effect):
+    #     with patch("time.sleep", return_value=None):  # Skip sleep
+    #         # Create a job executor pipe
+    #         job_executor = JobExecutorPipe(wait_for_completion=True)
             
-            # Create a parallel job executor
-            parallel_job_executor = FlowSplitJoinPipe(
-                inner_pipe=job_executor,
-                input_mapping={"job_script": "i"},
-                max_parallel=2
-            )
+    #         # Create a parallel job executor
+    #         parallel_job_executor = FlowSplitJoinPipe(
+    #             inner_pipe=job_executor,
+    #             input_mapping={"job_script": "i"},
+    #             max_parallel=2
+    #         )
             
-            # Run the parallel job executor
-            result = parallel_job_executor.execute({
-                "job_script": job_scripts
-            })
+    #         # Run the parallel job executor
+    #         result = parallel_job_executor.execute({
+    #             "job_script": job_scripts
+    #         })
             
-            # Check results
-            assert "status" in result
-            assert len(result["status"]) == 3
+    #         # Check results
+    #         assert "status" in result
+    #         assert len(result["status"]) == 3
             
-            # Verify all jobs completed successfully
-            for status in result["status"]:
-                assert status == "COMPLETED"
+    #         # Verify all jobs completed successfully
+    #         for status in result["status"]:
+    #             assert status == "COMPLETED"

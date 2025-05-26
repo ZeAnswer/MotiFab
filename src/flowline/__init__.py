@@ -6,7 +6,7 @@ from .flow_pipes.shuffle_pipes import NaiveShufflePipe, DiPairShufflePipe
 from .flow_pipes.injection_pipes import InjectMotifsIntoFastaRecordsPipe
 from .flow_pipes.utility_pipes import UnitAmountConverterPipe, CommandExecutorPipe
 from .flow_base.flow_builder import build_flow
-from .flow_pipes.enrichment_pipes import BatchJobExecutorPipe, SlurmJobGeneratorPipe, MemeCommandGeneratorPipe, JobExecutorPipe, HomerCommandGeneratorPipe
+from .flow_pipes.enrichment_pipes import BatchJobExecutorPipe, MemeCommandGeneratorPipe, JobExecutorPipe, HomerCommandGeneratorPipe#, SlurmJobGeneratorPipe
 from .flow_pipes.motif_detection_pipes import MotifLocalAlignmentPipe, PWMComparisonPipe,  StringToOneShotPWMPipe, MemeXmlParserPipe, HomerTextParserPipe, MotifSummaryPipe
 
 __all__ = [
@@ -45,7 +45,7 @@ __all__ = [
     
     # Enrichment pipes
     "BatchJobExecutorPipe",
-    "SlurmJobGeneratorPipe",
+    #"SlurmJobGeneratorPipe",
     "MemeCommandGeneratorPipe",
     "JobExecutorPipe",
     "HomerCommandGeneratorPipe",

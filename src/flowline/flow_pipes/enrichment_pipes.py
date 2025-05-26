@@ -493,109 +493,109 @@ class HomerCommandGeneratorPipe(DeNovoCommandGeneratorPipe):
             "run_id": run_id
         }
 
-class SlurmJobGeneratorPipe(FlowPipe):
-    """
-    Pipe for generating SLURM job submission scripts.
+# class SlurmJobGeneratorPipe(FlowPipe):
+#     """
+#     Pipe for generating SLURM job submission scripts.
     
-    Input:
-        - command: Command to run in the SLURM job
-        - output_dir: Directory to store job outputs
+#     Input:
+#         - command: Command to run in the SLURM job
+#         - output_dir: Directory to store job outputs
         
-    Output:
-        - job_script: Path to the generated job script #TODO change this to job path
-    """
+#     Output:
+#         - job_script: Path to the generated job script #TODO change this to job path
+#     """
     
-    def __init__(self, job_name="motif_analysis", slurm_params=None, module_name=None):
-        """
-        Initialize the SLURM job generator pipe.
+#     def __init__(self, job_name="motif_analysis", slurm_params=None, module_name=None):
+#         """
+#         Initialize the SLURM job generator pipe.
         
-        Args:
-            job_name: Name for the SLURM job
-            slurm_params: SLURM parameters (time, mem, cpus, etc.)
-            module_name: Module to load before running the command (e.g. meme-5.4.1)
-        """
-        # Define input and output names
-        inputs = ["command", "output_dir"]
-        outputs = ["job_script"]
+#         Args:
+#             job_name: Name for the SLURM job
+#             slurm_params: SLURM parameters (time, mem, cpus, etc.)
+#             module_name: Module to load before running the command (e.g. meme-5.4.1)
+#         """
+#         # Define input and output names
+#         inputs = ["command", "output_dir"]
+#         outputs = ["job_script"]
         
-        # Call parent constructor with our inputs, outputs, and action
-        super().__init__(inputs=inputs, outputs=outputs, action=self._generate_job_script)
+#         # Call parent constructor with our inputs, outputs, and action
+#         super().__init__(inputs=inputs, outputs=outputs, action=self._generate_job_script)
         
-        # Store parameters
-        self.job_name = job_name
-        self.module_name = module_name
+#         # Store parameters
+#         self.job_name = job_name
+#         self.module_name = module_name
         
-        # Default SLURM parameters
-        default_params = {
-            "time": "4:00:00",
-            "mem": "16GB",
-            "cpus_per_task": 4,
-            "partition": None
-        }
+#         # Default SLURM parameters
+#         default_params = {
+#             "time": "4:00:00",
+#             "mem": "16GB",
+#             "cpus_per_task": 4,
+#             "partition": None
+#         }
         
-        # Update with user-provided parameters if any
-        self.slurm_params = default_params
-        if slurm_params:
-            self.slurm_params.update(slurm_params)
+#         # Update with user-provided parameters if any
+#         self.slurm_params = default_params
+#         if slurm_params:
+#             self.slurm_params.update(slurm_params)
     
-    def _generate_job_script(self, data):
-        """Generate a SLURM job script based on the provided command and output directory."""
-        # Extract required inputs
-        command = data.get("command")
-        output_dir = data.get("output_dir")
+#     def _generate_job_script(self, data):
+#         """Generate a SLURM job script based on the provided command and output directory."""
+#         # Extract required inputs
+#         command = data.get("command")
+#         output_dir = data.get("output_dir")
         
-        # Validate required inputs
-        if not command:
-            raise ValueError("Missing required input: command")
-        if not output_dir:
-            raise ValueError("Missing required input: output_dir")
-        if not self.module_name:
-            raise ValueError("Module name must be provided during initialization")
+#         # Validate required inputs
+#         if not command:
+#             raise ValueError("Missing required input: command")
+#         if not output_dir:
+#             raise ValueError("Missing required input: output_dir")
+#         if not self.module_name:
+#             raise ValueError("Module name must be provided during initialization")
                 
-        # Create the output directory if it doesn't exist
-        os.makedirs(output_dir, exist_ok=True)
+#         # Create the output directory if it doesn't exist
+#         os.makedirs(output_dir, exist_ok=True)
         
-        # Set up paths for the job script and output files
-        job_script_filename = f"{self.job_name}_job.sh"
-        job_script_path = os.path.join(output_dir, job_script_filename)
-        stdout_path = os.path.join(output_dir, f"{self.job_name}.out")
-        stderr_path = os.path.join(output_dir, f"{self.job_name}.err")
+#         # Set up paths for the job script and output files
+#         job_script_filename = f"{self.job_name}_job.sh"
+#         job_script_path = os.path.join(output_dir, job_script_filename)
+#         stdout_path = os.path.join(output_dir, f"{self.job_name}.out")
+#         stderr_path = os.path.join(output_dir, f"{self.job_name}.err")
         
-        # Generate the job script
-        with open(job_script_path, 'w') as f:
-            f.write("#!/bin/bash\n")
+#         # Generate the job script
+#         with open(job_script_path, 'w') as f:
+#             f.write("#!/bin/bash\n")
             
-            # Add SLURM parameters
-            f.write(f"#SBATCH --job-name={self.job_name}\n")
-            f.write(f"#SBATCH --output={stdout_path}\n")
-            f.write(f"#SBATCH --error={stderr_path}\n")
-            f.write(f"#SBATCH --time={self.slurm_params['time']}\n")
-            f.write(f"#SBATCH --mem={self.slurm_params['mem']}\n")
-            f.write(f"#SBATCH --cpus-per-task={self.slurm_params['cpus_per_task']}\n")
+#             # Add SLURM parameters
+#             f.write(f"#SBATCH --job-name={self.job_name}\n")
+#             f.write(f"#SBATCH --output={stdout_path}\n")
+#             f.write(f"#SBATCH --error={stderr_path}\n")
+#             f.write(f"#SBATCH --time={self.slurm_params['time']}\n")
+#             f.write(f"#SBATCH --mem={self.slurm_params['mem']}\n")
+#             f.write(f"#SBATCH --cpus-per-task={self.slurm_params['cpus_per_task']}\n")
             
-            # Add partition if specified
-            if self.slurm_params['partition']:
-                f.write(f"#SBATCH --partition={self.slurm_params['partition']}\n")
+#             # Add partition if specified
+#             if self.slurm_params['partition']:
+#                 f.write(f"#SBATCH --partition={self.slurm_params['partition']}\n")
             
-            f.write("\n")
+#             f.write("\n")
             
-            # Load the module
-            f.write(f"module load {self.module_name}\n")
+#             # Load the module
+#             f.write(f"module load {self.module_name}\n")
             
-            # Add the command
-            f.write(f"echo 'Running command: {command}'\n")
-            f.write(f"echo 'Started at: ' $(date)\n")
-            f.write(f"{command}\n")
-            f.write(f"EXIT_CODE=$?\n")
-            f.write(f"echo 'Finished at: ' $(date)\n")
-            f.write(f"echo 'Exit code: ' $EXIT_CODE\n")
-            f.write(f"exit $EXIT_CODE\n")
+#             # Add the command
+#             f.write(f"echo 'Running command: {command}'\n")
+#             f.write(f"echo 'Started at: ' $(date)\n")
+#             f.write(f"{command}\n")
+#             f.write(f"EXIT_CODE=$?\n")
+#             f.write(f"echo 'Finished at: ' $(date)\n")
+#             f.write(f"echo 'Exit code: ' $EXIT_CODE\n")
+#             f.write(f"exit $EXIT_CODE\n")
         
-        # Make the script executable
-        os.chmod(job_script_path, 0o755)
+#         # Make the script executable
+#         os.chmod(job_script_path, 0o755)
         
-        # Return the job script path
-        return {"job_script": job_script_path}
+#         # Return the job script path
+#         return {"job_script": job_script_path}
 
 class JobExecutorPipe(FlowPipe):
     """
