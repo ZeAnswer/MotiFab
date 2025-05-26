@@ -774,146 +774,146 @@ class MotifSummaryPipe(FlowPipe):
         
         return result
 
-class HomerTextParserPipe(FlowPipe):
-    """
-    Pipe for parsing HOMER text results files to extract detailed motif information.
+# class HomerTextParserPipe(FlowPipe):
+#     """
+#     Pipe for parsing HOMER text results files to extract detailed motif information.
     
-    Input:
-        - output_dir: Directory containing HOMER output (with homer.txt)
-        - status: Job execution status (must be "COMPLETED" to proceed)
+#     Input:
+#         - output_dir: Directory containing HOMER output (with homer.txt)
+#         - status: Job execution status (must be "COMPLETED" to proceed)
         
-    Output:
-        - motifs: List of motif objects with detailed information:
-            {
-                'id': motif ID (e.g. 'motif_1'),
-                'name': motif name,
-                'consensus': consensus string,
-                'width': width of the motif,
-                'p_value': p-value of the motif,
-                'sites': number of sites,
-                'pwm': position weight matrix as a dict with keys for A, C, G, T
-                'locations': list of locations where motif was found
-            }
-    """
-    def __init__(self):
-        """Initialize the HOMER text parser pipe."""
-        inputs = ["output_dir", "status"]
-        outputs = ["motifs"]
-        super().__init__(inputs=inputs, outputs=outputs, action=self._parse_homer_text)
+#     Output:
+#         - motifs: List of motif objects with detailed information:
+#             {
+#                 'id': motif ID (e.g. 'motif_1'),
+#                 'name': motif name,
+#                 'consensus': consensus string,
+#                 'width': width of the motif,
+#                 'p_value': p-value of the motif,
+#                 'sites': number of sites,
+#                 'pwm': position weight matrix as a dict with keys for A, C, G, T
+#                 'locations': list of locations where motif was found
+#             }
+#     """
+#     def __init__(self):
+#         """Initialize the HOMER text parser pipe."""
+#         inputs = ["output_dir", "status"]
+#         outputs = ["motifs"]
+#         super().__init__(inputs=inputs, outputs=outputs, action=self._parse_homer_text)
     
-    def _parse_homer_text(self, data):
-        """Parse HOMER text results to extract detailed motif information."""
-        result = {}
+#     def _parse_homer_text(self, data):
+#         """Parse HOMER text results to extract detailed motif information."""
+#         result = {}
         
-        # Get required inputs
-        output_dir = data.get('output_dir')
-        status = data.get('status')
+#         # Get required inputs
+#         output_dir = data.get('output_dir')
+#         status = data.get('status')
         
-        # Validate required inputs
-        if not output_dir:
-            raise ValueError("Missing required input: output_dir")
-        if not status:
-            raise ValueError("Missing required input: status")
+#         # Validate required inputs
+#         if not output_dir:
+#             raise ValueError("Missing required input: output_dir")
+#         if not status:
+#             raise ValueError("Missing required input: status")
             
-        # Check if the job execution was successful
-        if status != "COMPLETED":
-            raise ValueError(f"Cannot parse HOMER results: job status is {status}, expected COMPLETED")
+#         # Check if the job execution was successful
+#         if status != "COMPLETED":
+#             raise ValueError(f"Cannot parse HOMER results: job status is {status}, expected COMPLETED")
         
-        # Check if the output directory exists
-        if not os.path.isdir(output_dir):
-            print(f"Output directory does not exist: {output_dir}")
-            raise ValueError(f"Output directory does not exist: {output_dir}")
+#         # Check if the output directory exists
+#         if not os.path.isdir(output_dir):
+#             print(f"Output directory does not exist: {output_dir}")
+#             raise ValueError(f"Output directory does not exist: {output_dir}")
         
-        # Check for the homer.txt file, which contains the results
-        homer_txt_path = os.path.join(output_dir, "homer.txt")
-        if not os.path.isfile(homer_txt_path):
-            print(f"HOMER text file not found: {homer_txt_path}")
-            raise ValueError(f"HOMER text file not found: {homer_txt_path}")
+#         # Check for the homer.txt file, which contains the results
+#         homer_txt_path = os.path.join(output_dir, "homer.txt")
+#         if not os.path.isfile(homer_txt_path):
+#             print(f"HOMER text file not found: {homer_txt_path}")
+#             raise ValueError(f"HOMER text file not found: {homer_txt_path}")
         
-        # Parse the text file
-        try:
-            with open(homer_txt_path, 'r') as f:
-                lines = f.readlines()
+#         # Parse the text file
+#         try:
+#             with open(homer_txt_path, 'r') as f:
+#                 lines = f.readlines()
             
-            # List to store parsed motifs
-            motifs = []
-            current_motif = None
-            pwm_lines = []
+#             # List to store parsed motifs
+#             motifs = []
+#             current_motif = None
+#             pwm_lines = []
             
-            for line in lines:
-                line = line.strip()
-                if not line:
-                    continue
+#             for line in lines:
+#                 line = line.strip()
+#                 if not line:
+#                     continue
                 
-                # Check if this is a motif header line (starts with '>')
-                if line.startswith('>'):
-                    # If we were processing a motif, add it to the list
-                    if current_motif:
-                        # Process PWM lines
-                        pwm = self._parse_pwm_lines(pwm_lines)
-                        current_motif['pwm'] = pwm
-                        motifs.append(current_motif)
+#                 # Check if this is a motif header line (starts with '>')
+#                 if line.startswith('>'):
+#                     # If we were processing a motif, add it to the list
+#                     if current_motif:
+#                         # Process PWM lines
+#                         pwm = self._parse_pwm_lines(pwm_lines)
+#                         current_motif['pwm'] = pwm
+#                         motifs.append(current_motif)
                     
-                    # Start a new motif
-                    parts = line[1:].split('\t')
-                    motif_id = parts[0]
-                    motif_name = parts[1]
+#                     # Start a new motif
+#                     parts = line[1:].split('\t')
+#                     motif_id = parts[0]
+#                     motif_name = parts[1]
                     
-                    # Extract statistics from the header
-                    stats = {}
-                    for stat in parts[2:]:
-                        if ':' in stat:
-                            key, value = stat.split(':', 1)
-                            stats[key] = value
+#                     # Extract statistics from the header
+#                     stats = {}
+#                     for stat in parts[2:]:
+#                         if ':' in stat:
+#                             key, value = stat.split(':', 1)
+#                             stats[key] = value
                     
-                    # Create the motif object
-                    current_motif = {
-                        'id': motif_id,
-                        'name': motif_name,
-                        'consensus': motif_id,  # Use the motif ID as consensus
-                        'width': len(motif_id),  # Width is the length of the motif ID
-                        'p_value': stats.get('P', '1'),  # Default to 1e-10 if not provided
-                        'sites': int(stats.get('T', '-1').split('.')[0]),  # Extract number from T:175.0(35.00%)
-                    }
+#                     # Create the motif object
+#                     current_motif = {
+#                         'id': motif_id,
+#                         'name': motif_name,
+#                         'consensus': motif_id,  # Use the motif ID as consensus
+#                         'width': len(motif_id),  # Width is the length of the motif ID
+#                         'p_value': stats.get('P', '1'),  # Default to 1e-10 if not provided
+#                         'sites': int(stats.get('T', '-1').split('.')[0]),  # Extract number from T:175.0(35.00%)
+#                     }
                     
-                    # Reset PWM lines
-                    pwm_lines = []
-                else:
-                    # This is a PWM line
-                    pwm_lines.append(line)
+#                     # Reset PWM lines
+#                     pwm_lines = []
+#                 else:
+#                     # This is a PWM line
+#                     pwm_lines.append(line)
             
-            # Add the last motif if there is one
-            if current_motif:
-                pwm = self._parse_pwm_lines(pwm_lines)
-                current_motif['pwm'] = pwm
-                motifs.append(current_motif)
+#             # Add the last motif if there is one
+#             if current_motif:
+#                 pwm = self._parse_pwm_lines(pwm_lines)
+#                 current_motif['pwm'] = pwm
+#                 motifs.append(current_motif)
             
-            # Add motifs to result
-            result['motifs'] = motifs
+#             # Add motifs to result
+#             result['motifs'] = motifs
             
-        except Exception as e:
-            print(f"Error parsing HOMER text: {str(e)}")
-            raise ValueError(f"Error parsing HOMER text: {str(e)}")
+#         except Exception as e:
+#             print(f"Error parsing HOMER text: {str(e)}")
+#             raise ValueError(f"Error parsing HOMER text: {str(e)}")
         
-        # Return results
-        return result
+#         # Return results
+#         return result
     
-    def _parse_pwm_lines(self, pwm_lines):
-        """Parse PWM lines into a dictionary format."""
-        pwm = {'A': [], 'C': [], 'G': [], 'T': []}
+#     def _parse_pwm_lines(self, pwm_lines):
+#         """Parse PWM lines into a dictionary format."""
+#         pwm = {'A': [], 'C': [], 'G': [], 'T': []}
         
-        for line in pwm_lines:
-            values = line.split('\t')
-            if len(values) != 4:
-                continue
+#         for line in pwm_lines:
+#             values = line.split('\t')
+#             if len(values) != 4:
+#                 continue
             
-            # Add probabilities for each nucleotide
-            pwm['A'].append(float(values[0]))
-            pwm['C'].append(float(values[1]))
-            pwm['G'].append(float(values[2]))
-            pwm['T'].append(float(values[3]))
+#             # Add probabilities for each nucleotide
+#             pwm['A'].append(float(values[0]))
+#             pwm['C'].append(float(values[1]))
+#             pwm['G'].append(float(values[2]))
+#             pwm['T'].append(float(values[3]))
         
-        return pwm
+#         return pwm
 
 # parserData = MemeXmlParserPipe().execute({'output_dir': 'meme_output_test_dir_40_50pct_run1', 'status': 'COMPLETED'})
 # localAlignmentData = MotifLocalAlignmentPipe(injected_motif='AAACCCTTTGGG').execute({

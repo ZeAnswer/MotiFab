@@ -355,143 +355,143 @@ class MemeCommandGeneratorPipe(DeNovoCommandGeneratorPipe):
             "run_id": run_id
         }
 
-class HomerCommandGeneratorPipe(DeNovoCommandGeneratorPipe):
-    """
-    Pipe for generating HOMER commands based on input parameters.
+# class HomerCommandGeneratorPipe(DeNovoCommandGeneratorPipe):
+#     """
+#     Pipe for generating HOMER commands based on input parameters.
     
-    Input:
-        summary_record:
-            - test_fasta_path: Path to the test FASTA file
-            - background_fasta_path: Path to the background FASTA file
-            - run_id: Identifier for this test run
+#     Input:
+#         summary_record:
+#             - test_fasta_path: Path to the test FASTA file
+#             - background_fasta_path: Path to the background FASTA file
+#             - run_id: Identifier for this test run
         
-    Output:
-        - command: The HOMER command to run
-        - output_dir: Complete output directory path (prefix + run_id)
-        - run_id: The test identifier (passed through)
-    """
+#     Output:
+#         - command: The HOMER command to run
+#         - output_dir: Complete output directory path (prefix + run_id)
+#         - run_id: The test identifier (passed through)
+#     """
     
-    def __init__(self, homer_params=None, output_dir_prefix="homer_output", files_dir=None, extra_params=None,
-                 motif_length=None, num_motifs=None, strand=None, revcomp=None):
-        """
-        Initialize the HOMER command generator pipe.
+#     def __init__(self, homer_params=None, output_dir_prefix="homer_output", files_dir=None, extra_params=None,
+#                  motif_length=None, num_motifs=None, strand=None, revcomp=None):
+#         """
+#         Initialize the HOMER command generator pipe.
         
-        Args:
-            homer_params: HOMER parameters to use for command generation
-            output_dir_prefix: Prefix for output directories
-            files_dir: Directory where input files are stored
-            extra_params: Additional parameters to append to the command
-            motif_length: Motif length specification (e.g., "5,6,7,8" for list)
-            num_motifs: Number of motifs to find
-            strand: Strand specification ("+", "-", "both")
-            revcomp: Whether to consider reverse complement (True/False)
-        """
-        # Call parent constructor
-        super().__init__(output_dir_prefix=output_dir_prefix, files_dir=files_dir, extra_params=extra_params,
-                         motif_length=motif_length, num_motifs=num_motifs, strand=strand, revcomp=revcomp)
+#         Args:
+#             homer_params: HOMER parameters to use for command generation
+#             output_dir_prefix: Prefix for output directories
+#             files_dir: Directory where input files are stored
+#             extra_params: Additional parameters to append to the command
+#             motif_length: Motif length specification (e.g., "5,6,7,8" for list)
+#             num_motifs: Number of motifs to find
+#             strand: Strand specification ("+", "-", "both")
+#             revcomp: Whether to consider reverse complement (True/False)
+#         """
+#         # Call parent constructor
+#         super().__init__(output_dir_prefix=output_dir_prefix, files_dir=files_dir, extra_params=extra_params,
+#                          motif_length=motif_length, num_motifs=num_motifs, strand=strand, revcomp=revcomp)
         
-        # Store HOMER parameters
-        self.homer_params = homer_params or {}
+#         # Store HOMER parameters
+#         self.homer_params = homer_params or {}
         
-        # Update homer_params with common parameters if provided
-        if motif_length:
-            motif_length_params = self._parse_motif_length(motif_length)
-            if motif_length_params:
-                self.homer_params.update(motif_length_params)
+#         # Update homer_params with common parameters if provided
+#         if motif_length:
+#             motif_length_params = self._parse_motif_length(motif_length)
+#             if motif_length_params:
+#                 self.homer_params.update(motif_length_params)
                 
-        if num_motifs:
-            self.homer_params["S"] = num_motifs
+#         if num_motifs:
+#             self.homer_params["S"] = num_motifs
             
-        if strand:
-            strand_param = self._parse_strand(strand)
-            if strand_param:
-                self.homer_params.update(strand_param)
+#         if strand:
+#             strand_param = self._parse_strand(strand)
+#             if strand_param:
+#                 self.homer_params.update(strand_param)
                 
-        if revcomp is not None:
-            # HOMER doesn't have a direct revcomp parameter, it's handled by strand
-            pass
+#         if revcomp is not None:
+#             # HOMER doesn't have a direct revcomp parameter, it's handled by strand
+#             pass
     
-    def _convert_range_to_tool_format(self, min_length, max_length):
-        """Convert a range of motif lengths to HOMER format."""
-        # HOMER doesn't support a range directly, so we'll generate a comma-separated list of lengths
-        return {
-            "len": ",".join(str(x) for x in range(min_length, max_length + 1))
-        }
+#     def _convert_range_to_tool_format(self, min_length, max_length):
+#         """Convert a range of motif lengths to HOMER format."""
+#         # HOMER doesn't support a range directly, so we'll generate a comma-separated list of lengths
+#         return {
+#             "len": ",".join(str(x) for x in range(min_length, max_length + 1))
+#         }
     
-    def _convert_list_to_tool_format(self, lengths):
-        """Convert a list of motif lengths to HOMER format."""
-        return {
-            "len": ",".join(str(x) for x in lengths)
-        }
+#     def _convert_list_to_tool_format(self, lengths):
+#         """Convert a list of motif lengths to HOMER format."""
+#         return {
+#             "len": ",".join(str(x) for x in lengths)
+#         }
     
-    def _convert_single_to_tool_format(self, length):
-        """Convert a single motif length to HOMER format."""
-        return {
-            "len": length
-        }
+#     def _convert_single_to_tool_format(self, length):
+#         """Convert a single motif length to HOMER format."""
+#         return {
+#             "len": length
+#         }
     
-    def _convert_forward_strand_to_tool_format(self):
-        """Convert forward strand specification to HOMER format."""
-        return {
-            "strand": "+"
-        }
+#     def _convert_forward_strand_to_tool_format(self):
+#         """Convert forward strand specification to HOMER format."""
+#         return {
+#             "strand": "+"
+#         }
     
-    def _convert_reverse_strand_to_tool_format(self):
-        """Convert reverse strand specification to HOMER format."""
-        return {
-            "strand": "-"
-        }
+#     def _convert_reverse_strand_to_tool_format(self):
+#         """Convert reverse strand specification to HOMER format."""
+#         return {
+#             "strand": "-"
+#         }
     
-    def _convert_both_strand_to_tool_format(self):
-        """Convert both strand specification to HOMER format."""
-        return {
-            "strand": "both"
-        }
+#     def _convert_both_strand_to_tool_format(self):
+#         """Convert both strand specification to HOMER format."""
+#         return {
+#             "strand": "both"
+#         }
     
-    def _generate_command(self, data):
-        """Generate HOMER command based on input parameters."""
-        # Extract and validate required inputs
-        summary_record = data.get("summary_record")
-        test_fasta_path, background_fasta_path, run_id = self._validate_inputs(summary_record)
+#     def _generate_command(self, data):
+#         """Generate HOMER command based on input parameters."""
+#         # Extract and validate required inputs
+#         summary_record = data.get("summary_record")
+#         test_fasta_path, background_fasta_path, run_id = self._validate_inputs(summary_record)
         
-        # Prepare paths and create output directory
-        test_fasta_path, background_fasta_path, output_dir = self._prepare_paths(
-            test_fasta_path, background_fasta_path, run_id
-        )
+#         # Prepare paths and create output directory
+#         test_fasta_path, background_fasta_path, output_dir = self._prepare_paths(
+#             test_fasta_path, background_fasta_path, run_id
+#         )
         
-        # Build the HOMER command
-        cmd_parts = ["homer2 denovo"]
+#         # Build the HOMER command
+#         cmd_parts = ["homer2 denovo"]
         
-        # Add the input and background files
-        cmd_parts.append(f'-i "{test_fasta_path}"')
-        cmd_parts.append(f'-b "{background_fasta_path}"')
+#         # Add the input and background files
+#         cmd_parts.append(f'-i "{test_fasta_path}"')
+#         cmd_parts.append(f'-b "{background_fasta_path}"')
         
-        # Add the output file
-        output_file = os.path.join(output_dir, "homer.txt")
-        #cmd_parts.append(f'-o "{output_file}"')
+#         # Add the output file
+#         output_file = os.path.join(output_dir, "homer.txt")
+#         #cmd_parts.append(f'-o "{output_file}"')
         
-        # Add parameters with values
-        for param, value in self.homer_params.items():
-            # Format parameters with hyphens
-            param_str = param.replace('_', '-')
+#         # Add parameters with values
+#         for param, value in self.homer_params.items():
+#             # Format parameters with hyphens
+#             param_str = param.replace('_', '-')
             
-            # Add the parameter
-            if value is not None:
-                cmd_parts.append(f"-{param_str} {value}")
+#             # Add the parameter
+#             if value is not None:
+#                 cmd_parts.append(f"-{param_str} {value}")
         
-        # Add any extra parameters
-        if self.extra_params:
-            cmd_parts.append(self.extra_params)
+#         # Add any extra parameters
+#         if self.extra_params:
+#             cmd_parts.append(self.extra_params)
         
-        # Construct the final command
-        command = " ".join(cmd_parts)
+#         # Construct the final command
+#         command = " ".join(cmd_parts)
         
-        # Return the results
-        return {
-            "command": command,
-            "output_dir": output_dir,
-            "run_id": run_id
-        }
+#         # Return the results
+#         return {
+#             "command": command,
+#             "output_dir": output_dir,
+#             "run_id": run_id
+#         }
 
 # class SlurmJobGeneratorPipe(FlowPipe):
 #     """

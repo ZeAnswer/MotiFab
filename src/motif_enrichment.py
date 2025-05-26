@@ -48,8 +48,8 @@ def write_csv(file_path, data):
 # Import flow modules
 from flowline import (
     FlowManager, FlowPipe, FlowOutputFilter,
-    MemeCommandGeneratorPipe, HomerCommandGeneratorPipe,
-    build_flow, JobExecutorPipe, MemeXmlParserPipe, HomerTextParserPipe, MotifLocalAlignmentPipe, PWMComparisonPipe, ParsePWMPipe, CommandExecutorPipe, MotifSummaryPipe, FlowSubPipeline, FlowSplitJoinPipe
+    MemeCommandGeneratorPipe,
+    build_flow, JobExecutorPipe, MemeXmlParserPipe, MotifLocalAlignmentPipe, PWMComparisonPipe, ParsePWMPipe, CommandExecutorPipe, MotifSummaryPipe, FlowSubPipeline, FlowSplitJoinPipe#, HomerTextParserPipe, HomerCommandGeneratorPipe
 )
 
 # --- Build the sub-flow configuration ---
@@ -109,22 +109,22 @@ def build_sub_flow(files_dir, output_dir, tool_type='meme', config=None, injecte
                 '*': {'summary_record': 'summary_record'}
             }
         }
-    else:  # homer
-        sub_flow_config['command_gen'] = {
-            'type': HomerCommandGeneratorPipe,
-            'init': {
-                'output_dir_prefix': output_dir,
-                'files_dir': files_dir,
-                'extra_params': extra_params,
-                'motif_length': motif_length,
-                'num_motifs': num_motifs,
-                'strand': strand,
-                'revcomp': revcomp
-            },
-            'upstream_pipes': {
-                '*': {'summary_record': 'summary_record'}
-            }
-        }
+    # else:  # homer
+    #     sub_flow_config['command_gen'] = {
+    #         'type': HomerCommandGeneratorPipe,
+    #         'init': {
+    #             'output_dir_prefix': output_dir,
+    #             'files_dir': files_dir,
+    #             'extra_params': extra_params,
+    #             'motif_length': motif_length,
+    #             'num_motifs': num_motifs,
+    #             'strand': strand,
+    #             'revcomp': revcomp
+    #         },
+    #         'upstream_pipes': {
+    #             '*': {'summary_record': 'summary_record'}
+    #         }
+    #     }
     
     # Pipe 2: Execute command.
     sub_flow_config['command_exec'] = {
@@ -145,15 +145,15 @@ def build_sub_flow(files_dir, output_dir, tool_type='meme', config=None, injecte
                 'command_gen': {'output_dir': 'output_dir'}
             }
         }
-    else:  # homer
-        sub_flow_config['result_parse'] = {
-            'type': HomerTextParserPipe,
-            'init': {},
-            'upstream_pipes': {
-                'command_exec': {'status': 'status'},
-                'command_gen': {'output_dir': 'output_dir'}
-            }
-        }
+    # else:  # homer
+    #     sub_flow_config['result_parse'] = {
+    #         'type': HomerTextParserPipe,
+    #         'init': {},
+    #         'upstream_pipes': {
+    #             'command_exec': {'status': 'status'},
+    #             'command_gen': {'output_dir': 'output_dir'}
+    #         }
+    #     }
     
     if use_pwm:
         # PWM branch.

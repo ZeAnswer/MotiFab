@@ -6,8 +6,8 @@ from .flow_pipes.shuffle_pipes import NaiveShufflePipe, DiPairShufflePipe
 from .flow_pipes.injection_pipes import InjectMotifsIntoFastaRecordsPipe
 from .flow_pipes.utility_pipes import UnitAmountConverterPipe, CommandExecutorPipe
 from .flow_base.flow_builder import build_flow
-from .flow_pipes.enrichment_pipes import BatchJobExecutorPipe, MemeCommandGeneratorPipe, JobExecutorPipe, HomerCommandGeneratorPipe#, SlurmJobGeneratorPipe
-from .flow_pipes.motif_detection_pipes import MotifLocalAlignmentPipe, PWMComparisonPipe,  StringToOneShotPWMPipe, MemeXmlParserPipe, HomerTextParserPipe, MotifSummaryPipe
+from .flow_pipes.enrichment_pipes import BatchJobExecutorPipe, MemeCommandGeneratorPipe, JobExecutorPipe#, HomerCommandGeneratorPipe, SlurmJobGeneratorPipe
+from .flow_pipes.motif_detection_pipes import MotifLocalAlignmentPipe, PWMComparisonPipe,  StringToOneShotPWMPipe, MemeXmlParserPipe, MotifSummaryPipe#, HomerTextParserPipe
 
 __all__ = [
     # Base classes
@@ -48,11 +48,11 @@ __all__ = [
     #"SlurmJobGeneratorPipe",
     "MemeCommandGeneratorPipe",
     "JobExecutorPipe",
-    "HomerCommandGeneratorPipe",
+    #"HomerCommandGeneratorPipe",
     
     # Motif detection pipes
     "MemeXmlParserPipe",
-    "HomerTextParserPipe",
+    #"HomerTextParserPipe",
     "MotifLocalAlignmentPipe",
     "PWMComparisonPipe",
     "StringToOneShotPWMPipe",

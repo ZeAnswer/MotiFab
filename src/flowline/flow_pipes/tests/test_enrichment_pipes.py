@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 from flowline import MemeCommandGeneratorPipe, FlowSplitJoinPipe#, FlowParallelPipe, SlurmJobGeneratorPipe
-from flowline.flow_pipes.enrichment_pipes import BatchJobExecutorPipe, JobExecutorPipe, HomerCommandGeneratorPipe
+from flowline.flow_pipes.enrichment_pipes import BatchJobExecutorPipe, JobExecutorPipe#, HomerCommandGeneratorPipe
 
 # Test data
 TEST_FASTA_CONTENT = """>seq1 Test sequence 1
@@ -365,286 +365,286 @@ def test_meme_command_generator_revcomp(test_fasta_files, temp_output_dir):
 
 # --- HomerCommandGeneratorPipe Tests ---
 
-def test_homer_command_generator_basic(test_fasta_files, temp_output_dir):
-    """Test basic HOMER command generation with default parameters."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_basic(test_fasta_files, temp_output_dir):
+#     """Test basic HOMER command generation with default parameters."""
+#     test_path, bg_path = test_fasta_files
     
-    pipe = HomerCommandGeneratorPipe(output_dir_prefix=temp_output_dir)
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "test_run1"}
-    }
+#     pipe = HomerCommandGeneratorPipe(output_dir_prefix=temp_output_dir)
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "test_run1"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check outputs
-    assert "command" in result
-    assert "output_dir" in result
-    assert "run_id" in result
+#     # Check outputs
+#     assert "command" in result
+#     assert "output_dir" in result
+#     assert "run_id" in result
     
-    # Check output values
-    assert test_path in result["command"]
-    assert bg_path in result["command"]
-    assert os.path.join(temp_output_dir, "test_run1") == result["output_dir"]
-    assert "homer2 denovo" in result["command"]
-    assert "-i" in result["command"]
-    assert "-b" in result["command"]
-    assert "-o" in result["command"]
-    assert result["run_id"] == "test_run1"
+#     # Check output values
+#     assert test_path in result["command"]
+#     assert bg_path in result["command"]
+#     assert os.path.join(temp_output_dir, "test_run1") == result["output_dir"]
+#     assert "homer2 denovo" in result["command"]
+#     assert "-i" in result["command"]
+#     assert "-b" in result["command"]
+#     assert "-o" in result["command"]
+#     assert result["run_id"] == "test_run1"
     
-    # Check that output directory was created
-    assert os.path.exists(result["output_dir"])
+#     # Check that output directory was created
+#     assert os.path.exists(result["output_dir"])
 
-def test_homer_command_generator_custom_params(test_fasta_files, temp_output_dir):
-    """Test HOMER command generation with custom parameters."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_custom_params(test_fasta_files, temp_output_dir):
+#     """Test HOMER command generation with custom parameters."""
+#     test_path, bg_path = test_fasta_files
     
-    # Create a pipe with custom HOMER parameters
-    custom_params = {
-        "len": 15,
-        "mis": 3,
-        "strand": "+",
-        "stat": "hypergeo",
-        "S": 50,
-        "p": 4
-    }
+#     # Create a pipe with custom HOMER parameters
+#     custom_params = {
+#         "len": 15,
+#         "mis": 3,
+#         "strand": "+",
+#         "stat": "hypergeo",
+#         "S": 50,
+#         "p": 4
+#     }
     
-    pipe = HomerCommandGeneratorPipe(homer_params=custom_params, output_dir_prefix=temp_output_dir)
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "custom_params_run"}
-    }
+#     pipe = HomerCommandGeneratorPipe(homer_params=custom_params, output_dir_prefix=temp_output_dir)
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "custom_params_run"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check command reflects custom parameters
-    assert "-len 15" in result["command"]
-    assert "-mis 3" in result["command"]
-    assert "-strand +" in result["command"]
-    assert "-stat hypergeo" in result["command"]
-    assert "-S 50" in result["command"]
-    assert "-p 4" in result["command"]
-    assert result["run_id"] == "custom_params_run"
+#     # Check command reflects custom parameters
+#     assert "-len 15" in result["command"]
+#     assert "-mis 3" in result["command"]
+#     assert "-strand +" in result["command"]
+#     assert "-stat hypergeo" in result["command"]
+#     assert "-S 50" in result["command"]
+#     assert "-p 4" in result["command"]
+#     assert result["run_id"] == "custom_params_run"
 
-def test_homer_command_generator_extra_params(test_fasta_files, temp_output_dir):
-    """Test HOMER command generation with extra parameters."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_extra_params(test_fasta_files, temp_output_dir):
+#     """Test HOMER command generation with extra parameters."""
+#     test_path, bg_path = test_fasta_files
     
-    # Create a pipe with extra parameters
-    extra_params = "-fullMask -cache 1000"
+#     # Create a pipe with extra parameters
+#     extra_params = "-fullMask -cache 1000"
     
-    pipe = HomerCommandGeneratorPipe(output_dir_prefix=temp_output_dir, extra_params=extra_params)
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "extra_params_run"}
-    }
+#     pipe = HomerCommandGeneratorPipe(output_dir_prefix=temp_output_dir, extra_params=extra_params)
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "extra_params_run"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check that extra parameters are included in the command
-    assert "-fullMask" in result["command"]
-    assert "-cache 1000" in result["command"]
+#     # Check that extra parameters are included in the command
+#     assert "-fullMask" in result["command"]
+#     assert "-cache 1000" in result["command"]
 
-def test_homer_command_generator_missing_inputs():
-    """Test that errors are raised when required inputs are missing."""
-    pipe = HomerCommandGeneratorPipe(output_dir_prefix="output")
+# def test_homer_command_generator_missing_inputs():
+#     """Test that errors are raised when required inputs are missing."""
+#     pipe = HomerCommandGeneratorPipe(output_dir_prefix="output")
     
-    # Missing test_fasta_path
-    with pytest.raises(ValueError, match="Missing required input: test_fasta_path"):
-        pipe.execute({
-        "summary_record" : {
-            "background_fasta_path": "background.fa",
-            "run_id": "test1"}
-        })
+#     # Missing test_fasta_path
+#     with pytest.raises(ValueError, match="Missing required input: test_fasta_path"):
+#         pipe.execute({
+#         "summary_record" : {
+#             "background_fasta_path": "background.fa",
+#             "run_id": "test1"}
+#         })
     
-    # Missing background_fasta_path
-    with pytest.raises(ValueError, match="Missing required input: background_fasta_path"):
-        pipe.execute({
-        "summary_record" : {
-            "test_fasta_path": "test.fa",
-            "run_id": "test1"}
-        })
+#     # Missing background_fasta_path
+#     with pytest.raises(ValueError, match="Missing required input: background_fasta_path"):
+#         pipe.execute({
+#         "summary_record" : {
+#             "test_fasta_path": "test.fa",
+#             "run_id": "test1"}
+#         })
     
-    # Missing run_id
-    with pytest.raises(ValueError, match="Missing required input: run_id"):
-        pipe.execute({
-        "summary_record" : {
-            "test_fasta_path": "test.fa",
-            "background_fasta_path": "background.fa"}
-        })
+#     # Missing run_id
+#     with pytest.raises(ValueError, match="Missing required input: run_id"):
+#         pipe.execute({
+#         "summary_record" : {
+#             "test_fasta_path": "test.fa",
+#             "background_fasta_path": "background.fa"}
+#         })
 
-def test_homer_command_generator_output_dir_creation(test_fasta_files, temp_output_dir):
-    """Test that output directory is created if it doesn't exist."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_output_dir_creation(test_fasta_files, temp_output_dir):
+#     """Test that output directory is created if it doesn't exist."""
+#     test_path, bg_path = test_fasta_files
     
-    # Create a nested output directory path that doesn't exist yet
-    nested_dir = os.path.join(temp_output_dir, "nested", "dir")
-    run_id = "nested_test"
-    expected_output_dir = os.path.join(nested_dir, run_id)
+#     # Create a nested output directory path that doesn't exist yet
+#     nested_dir = os.path.join(temp_output_dir, "nested", "dir")
+#     run_id = "nested_test"
+#     expected_output_dir = os.path.join(nested_dir, run_id)
     
-    # Verify the directory doesn't exist yet
-    assert not os.path.exists(expected_output_dir)
+#     # Verify the directory doesn't exist yet
+#     assert not os.path.exists(expected_output_dir)
     
-    pipe = HomerCommandGeneratorPipe(output_dir_prefix=nested_dir)
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": run_id}
-    }
+#     pipe = HomerCommandGeneratorPipe(output_dir_prefix=nested_dir)
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": run_id}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check output directory was created
-    assert os.path.exists(expected_output_dir)
-    assert result["output_dir"] == expected_output_dir
+#     # Check output directory was created
+#     assert os.path.exists(expected_output_dir)
+#     assert result["output_dir"] == expected_output_dir
 
-def test_homer_command_generator_motif_length_range(test_fasta_files, temp_output_dir):
-    """Test HOMER command generation with motif length range."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_motif_length_range(test_fasta_files, temp_output_dir):
+#     """Test HOMER command generation with motif length range."""
+#     test_path, bg_path = test_fasta_files
     
-    # Create a pipe with motif length range
-    pipe = HomerCommandGeneratorPipe(
-        output_dir_prefix=temp_output_dir,
-        motif_length="5-8"
-    )
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "motif_length_range"}
-    }
+#     # Create a pipe with motif length range
+#     pipe = HomerCommandGeneratorPipe(
+#         output_dir_prefix=temp_output_dir,
+#         motif_length="5-8"
+#     )
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "motif_length_range"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check that motif length parameter is included in the command
-    # HOMER doesn't support a range directly, so it should use the min length
-    assert "-len 5" in result["command"]
+#     # Check that motif length parameter is included in the command
+#     # HOMER doesn't support a range directly, so it should use the min length
+#     assert "-len 5" in result["command"]
 
-def test_homer_command_generator_motif_length_list(test_fasta_files, temp_output_dir):
-    """Test HOMER command generation with motif length list."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_motif_length_list(test_fasta_files, temp_output_dir):
+#     """Test HOMER command generation with motif length list."""
+#     test_path, bg_path = test_fasta_files
     
-    # Create a pipe with motif length list
-    pipe = HomerCommandGeneratorPipe(
-        output_dir_prefix=temp_output_dir,
-        motif_length="5,6,7,8"
-    )
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "motif_length_list"}
-    }
+#     # Create a pipe with motif length list
+#     pipe = HomerCommandGeneratorPipe(
+#         output_dir_prefix=temp_output_dir,
+#         motif_length="5,6,7,8"
+#     )
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "motif_length_list"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check that motif length parameter is included in the command
-    # HOMER doesn't support a list directly, so it should use the first length
-    assert "-len 5" in result["command"]
+#     # Check that motif length parameter is included in the command
+#     # HOMER doesn't support a list directly, so it should use the first length
+#     assert "-len 5" in result["command"]
 
-def test_homer_command_generator_motif_length_single(test_fasta_files, temp_output_dir):
-    """Test HOMER command generation with single motif length."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_motif_length_single(test_fasta_files, temp_output_dir):
+#     """Test HOMER command generation with single motif length."""
+#     test_path, bg_path = test_fasta_files
     
-    # Create a pipe with single motif length
-    pipe = HomerCommandGeneratorPipe(
-        output_dir_prefix=temp_output_dir,
-        motif_length="5"
-    )
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "motif_length_single"}
-    }
+#     # Create a pipe with single motif length
+#     pipe = HomerCommandGeneratorPipe(
+#         output_dir_prefix=temp_output_dir,
+#         motif_length="5"
+#     )
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "motif_length_single"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check that motif length parameter is included in the command
-    assert "-len 5" in result["command"]
+#     # Check that motif length parameter is included in the command
+#     assert "-len 5" in result["command"]
 
-def test_homer_command_generator_num_motifs(test_fasta_files, temp_output_dir):
-    """Test HOMER command generation with number of motifs."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_num_motifs(test_fasta_files, temp_output_dir):
+#     """Test HOMER command generation with number of motifs."""
+#     test_path, bg_path = test_fasta_files
     
-    # Create a pipe with number of motifs
-    pipe = HomerCommandGeneratorPipe(
-        output_dir_prefix=temp_output_dir,
-        num_motifs=15
-    )
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "num_motifs"}
-    }
+#     # Create a pipe with number of motifs
+#     pipe = HomerCommandGeneratorPipe(
+#         output_dir_prefix=temp_output_dir,
+#         num_motifs=15
+#     )
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "num_motifs"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check that number of motifs parameter is included in the command
-    assert "-S 15" in result["command"]
+#     # Check that number of motifs parameter is included in the command
+#     assert "-S 15" in result["command"]
 
-def test_homer_command_generator_strand(test_fasta_files, temp_output_dir):
-    """Test HOMER command generation with strand specification."""
-    test_path, bg_path = test_fasta_files
+# def test_homer_command_generator_strand(test_fasta_files, temp_output_dir):
+#     """Test HOMER command generation with strand specification."""
+#     test_path, bg_path = test_fasta_files
     
-    # Test forward strand
-    pipe = HomerCommandGeneratorPipe(
-        output_dir_prefix=temp_output_dir,
-        strand="+"
-    )
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "strand_forward"}
-    }
+#     # Test forward strand
+#     pipe = HomerCommandGeneratorPipe(
+#         output_dir_prefix=temp_output_dir,
+#         strand="+"
+#     )
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "strand_forward"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check that strand parameter is included in the command
-    assert "-strand +" in result["command"]
+#     # Check that strand parameter is included in the command
+#     assert "-strand +" in result["command"]
     
-    # Test reverse strand
-    pipe = HomerCommandGeneratorPipe(
-        output_dir_prefix=temp_output_dir,
-        strand="-"
-    )
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "strand_reverse"}
-    }
+#     # Test reverse strand
+#     pipe = HomerCommandGeneratorPipe(
+#         output_dir_prefix=temp_output_dir,
+#         strand="-"
+#     )
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "strand_reverse"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check that strand parameter is included in the command
-    assert "-strand -" in result["command"]
+#     # Check that strand parameter is included in the command
+#     assert "-strand -" in result["command"]
     
-    # Test both strands
-    pipe = HomerCommandGeneratorPipe(
-        output_dir_prefix=temp_output_dir,
-        strand="both"
-    )
-    data = {
-        "summary_record" : {
-        "test_fasta_path": test_path,
-        "background_fasta_path": bg_path,
-        "run_id": "strand_both"}
-    }
+#     # Test both strands
+#     pipe = HomerCommandGeneratorPipe(
+#         output_dir_prefix=temp_output_dir,
+#         strand="both"
+#     )
+#     data = {
+#         "summary_record" : {
+#         "test_fasta_path": test_path,
+#         "background_fasta_path": bg_path,
+#         "run_id": "strand_both"}
+#     }
     
-    result = pipe.execute(data)
+#     result = pipe.execute(data)
     
-    # Check that strand parameter is included in the command
-    assert "-strand both" in result["command"]
+#     # Check that strand parameter is included in the command
+#     assert "-strand both" in result["command"]
 
 # --- SlurmJobGeneratorPipe Tests ---
 

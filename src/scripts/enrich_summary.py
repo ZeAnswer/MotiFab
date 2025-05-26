@@ -16,8 +16,8 @@ import xml.etree.ElementTree as ET
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flowline.flow_pipes.motif_detection_pipes import (
-    MemeXmlParserPipe, HomerTextParserPipe, MotifLocalAlignmentPipe, StringToOneShotPWMPipe, 
-    PWMComparisonPipe, MotifSummaryPipe
+    MemeXmlParserPipe, MotifLocalAlignmentPipe, StringToOneShotPWMPipe, 
+    PWMComparisonPipe, MotifSummaryPipe#, HomerTextParserPipe
 )
 
 
@@ -26,8 +26,8 @@ def parse_motif_results(output_dir, run_id, tool_type='meme'):
     # Create the appropriate parser pipe
     if tool_type == 'meme':
         parser_pipe = MemeXmlParserPipe()
-    else:  # homer
-        parser_pipe = HomerTextParserPipe()
+    # else:  # homer
+    #     parser_pipe = HomerTextParserPipe()
     
     # Execute the pipe
     try:
