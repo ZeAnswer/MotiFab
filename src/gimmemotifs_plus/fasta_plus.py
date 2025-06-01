@@ -80,3 +80,53 @@ class FastaPlus(Fasta):
             seq_str = self._generate_random_sequence(min_length, max_length, gc_content)
             seq_id = f"{prefix}{i}"
             self.add(seq_id, seq_str)
+    
+    def inject_motif(
+        self,
+        motif,
+        injection_rate: float = None,
+        injection_amount: int = None
+    ) -> None:
+        """
+        Inject a motif into sequences in this FastaPlus object.
+
+        Args:
+            motif: Motif object to sample and inject.
+            injection_rate (float): Fraction of sequences to inject (0 <= rate <= 1).
+            injection_amount (int): Number of sequences to inject.
+        Raises:
+            ValueError: If neither injection_rate nor injection_amount is provided,
+                        or if injection_rate is out of [0,1].
+        """
+        total = len(self)
+        # Validate arguments
+        if injection_rate is None and injection_amount is None:
+            raise ValueError("Either injection_rate or injection_amount must be provided.")
+        if injection_rate is not None:
+            if not isinstance(injection_rate, (int, float)) or not (0.0 <= injection_rate <= 1.0):
+                raise ValueError(f"injection_rate must be between 0 and 1, got {injection_rate}")
+            count = int(round(injection_rate * total))
+        else:
+            count = injection_amount
+            if not isinstance(count, int) or count < 0:
+                raise ValueError(f"injection_amount must be a non-negative integer, got {injection_amount}")
+        # Adjust amount if too large
+        if count > total:
+            print(f"Warning: injection_amount {count} > number of sequences {total}; injecting all sequences.")
+            count = total
+        if count == 0:
+            return
+        # Sample sequences indices to inject
+        indices = random.sample(range(total), count)
+        # Sample motif strings
+        # motif.sample returns list of sequences
+        motif_seqs = motif.sample(count)
+        # Inject motifs
+        for idx, mseq in zip(indices, motif_seqs):
+            orig = self.seqs[idx]
+            if len(orig) < len(mseq):
+                continue
+            pos = random.randint(0, len(orig) - len(mseq))
+            new_seq = orig[:pos] + mseq + orig[pos + len(mseq):]
+            # Update sequence
+            self.seqs[idx] = new_seq
