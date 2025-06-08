@@ -1,6 +1,7 @@
 import random
 from gimmemotifs.fasta import Fasta
-
+import logging
+logger = logging.getLogger("gimmemotifs_plus.fasta_plus")
 
 class FastaPlus(Fasta):
     """
@@ -51,6 +52,51 @@ class FastaPlus(Fasta):
 
         nucleotides = "ACGT"
         return ''.join(random.choices(nucleotides, weights=weights, k=length))
+
+    def _get_exclusion_subset(self, excluded_fastaplus):
+        """
+        Get a subset of sequences that are not in the excluded FastaPlus object.
+        if excluded_fastaplus is None, return all sequences.
+        
+        Args:
+            excluded_fastaplus (FastaPlus): FastaPlus object with sequences to exclude.
+        
+        Returns:
+            FastaPlus: New FastaPlus with sequences not in excluded_fastaplus.
+        """
+        if excluded_fastaplus is None:
+            return self
+        
+        subset = FastaPlus()
+        for seq_id, seq in self.items():
+            if seq_id not in excluded_fastaplus.ids:
+                subset.add(seq_id, seq)
+        return subset
+
+    def get_random(self, n, length=None):
+        """Return n random sequences from this Fasta object"""
+        random_fp = FastaPlus()
+        if length:
+            ids = self.ids[:]
+            random.shuffle(ids)
+            i = 0
+            while (i < n) and (len(ids) > 0):
+                seq_id = ids.pop()
+                if len(self[seq_id]) >= length:
+                    start = random.randint(0, len(self[seq_id]) - length)
+                    random_fp[f"random{i + 1}"] = self[seq_id][start : start + length]
+                    i += 1
+            if len(random_fp) != n:
+                logger.error("Not enough sequences of required length")
+                return
+            else:
+                return random_fp
+        else:
+            print(f"@@@@@@@@@@ Selecting {n} random sequences from {len(self)} total sequences.")
+            choice = random.sample(self.ids, n)
+            for i in range(n):
+                random_fp[choice[i]] = self[choice[i]]
+        return random_fp
 
     def populate_random_fasta(
         self,
@@ -130,3 +176,86 @@ class FastaPlus(Fasta):
             new_seq = orig[:pos] + mseq + orig[pos + len(mseq):]
             # Update sequence
             self.seqs[idx] = new_seq
+
+    def create_injected_subset(
+        self,
+        motif,
+        amount,
+        injection_rate: float = None,
+        injection_amount: int = None
+    ) -> "FastaPlus":
+        """
+        Create a new FastaPlus with injected motif sequences.
+        Args:
+            motif: MotifPlus object to inject.
+            amount (int): Number of sequences in the new subset.
+            injection_rate (float): Fraction of sequences to inject (0 <= rate <= 1).
+            injection_amount (int): Number of sequences to inject.
+        Returns:
+            FastaPlus: New FastaPlus with injected sequences.
+        """
+        if not isinstance(amount, int) or amount <= 0:
+            raise ValueError(f"amount must be a positive integer, got {amount}")
+        # Create new FastaPlus
+        new_fasta = self.get_random(amount)
+        # Inject motif into the new subset
+        new_fasta.inject_motif(motif, injection_rate, injection_amount)
+        return new_fasta
+    
+    def create_non_overlapping_injected_subsets(
+        self,
+        motif,
+        seq_amount,
+        replicates: int = 1,
+        background_length: int | None = None,
+        injection_rate: float = None,
+        injection_amount: int = None
+    ) -> tuple[list["FastaPlus"], "FastaPlus | None"]:
+        """
+        Create multiple subsets with injected motifs. if background_length is provided,
+        generate a background sequence of that length which is not overlapping
+        with the other subsets.
+        
+        Args:
+            motif: MotifPlus object to inject.
+            seq_amount (int): Number of sequences in each subset.
+            replicates (int): Number of subsets to create.
+            background_length (int | None): Length of background sequence, if provided.
+            injection_rate (float): Fraction of sequences to inject (0 <= rate <= 1).
+            injection_amount (int): Number of sequences to inject.
+        
+        Returns:
+            list[FastaPlus]: List of new FastaPlus objects with injected sequences.
+            background (FastaPlus | None): Background FastaPlus object if background_length is provided, else None.
+        """
+        background = None
+        if not isinstance(replicates, int) or replicates <= 0:
+            raise ValueError(f"replicates must be a positive integer, got {replicates}")
+        if not isinstance(seq_amount, int) or seq_amount <= 0:
+            raise ValueError(f"seq_amount must be a positive integer, got {seq_amount}")
+        # must have at least one of these
+        if injection_rate is None and injection_amount is None:
+            raise ValueError("Either injection_rate or injection_amount must be provided.")
+        if injection_rate is not None:
+            if not isinstance(injection_rate, (int, float)) or not (0.0 <= injection_rate <= 1.0):
+                raise ValueError(f"injection_rate must be between 0 and 1, got {injection_rate}")
+        else:
+            if not isinstance(injection_amount, int) or injection_amount < 0:
+                raise ValueError(f"injection_amount must be a non-negative integer, got {injection_amount}")
+        # Create background if requested
+        if background_length is not None and background_length > 0:
+            background = self.get_random(background_length)
+        # Create excluded subset if background is provided
+        excluded_subset = self._get_exclusion_subset(background)
+        subsets = []
+        for i in range(replicates):
+            # Create new subset
+            new_subset = excluded_subset.create_injected_subset(
+                motif,
+                seq_amount,
+                injection_rate=injection_rate,
+                injection_amount=injection_amount
+            )
+            subsets.append(new_subset)
+        return subsets, background
+    
