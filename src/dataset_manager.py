@@ -90,6 +90,14 @@ class DatasetManager:
             return combination.get('replicates', {}).get(rep_name)
         return None
     
+    def get_all_reps(self) -> List[dict]:
+        """Retrieve all replicate entries across all combinations."""
+        all_replicates = []
+        for combo in self.config.get('combinations', {}).values():
+            if 'replicates' in combo:
+                all_replicates.extend(combo['replicates'].values())
+        return all_replicates
+    
     def upsert_rep_by_name(self, name: str, replicate_data: dict) -> None:
         """Insert or update a replicate entry by its name."""
         combo_name, _, rep_num = name.rpartition('_rep_')
@@ -129,6 +137,18 @@ class DatasetManager:
     def update_dataset_generation_params(self, params: dict) -> None:
         """Update the dataset generation parameters in the config."""
         self.config['dataset_generation_params'] = params
+        # Save the updated config to file
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
+        #TODO: think of a better way to handle this, since this will overwrite any existing params
+        
+    def get_denovo_params(self) -> dict:
+        """Retrieve the de novo motif discovery parameters from the config."""
+        return self.config.get('run_denovo_params', {})
+    
+    def update_denovo_params(self, params: dict) -> None:
+        """Update the de novo motif discovery parameters in the config."""
+        self.config['run_denovo_params'] = params
         # Save the updated config to file
         with open(self.config_path, 'w') as f:
             json.dump(self.config, f, indent=4)

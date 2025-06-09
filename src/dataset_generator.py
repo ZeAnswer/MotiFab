@@ -48,14 +48,17 @@ class DatasetGenerator:
         for i, injected_fastap in enumerate(injected_fastaps, start=1):
             replicate_name = mngr.get_rep_name(seq_amount, injection_rate, i)
             replicate_dir = mngr.get_rep_dir_path(out_dir, seq_amount, injection_rate, i)
+            gimme_out_dir = os.path.join(replicate_dir, 'gimme_out')
             replicate_file_path = mngr.get_rep_file_path(out_dir, seq_amount, injection_rate, i)
             os.makedirs(replicate_dir, exist_ok=True)
             injected_fastap.writefasta(replicate_file_path)
             combination['replicates'][replicate_name] = {
                 'name': replicate_name,
                 'dir': replicate_dir,
+                'gimme_out_dir': gimme_out_dir,
                 'test_fasta': replicate_file_path,
-                'status': 'generated'
+                'background_fasta': background_path if background_path else None,
+                'status': 'generated',
             }
         # Save combination to manager
         mngr.upsert_combo(seq_amount, injection_rate, combination)
@@ -65,7 +68,6 @@ class DatasetGenerator:
     def generate_datasets(
         self,
         master_fasta: Optional[str] = None,
-        genome_fasta: Optional[str] = None,
         output_dir: Optional[str] = None,
         seq_amounts: Optional[List[str]] = None,
         injection_rates: Optional[List[str]] = None,
@@ -85,7 +87,6 @@ class DatasetGenerator:
         params = self.params
         for key, val in [
             ('master_fasta', master_fasta),
-            ('genome_fasta', genome_fasta),
             ('output_dir', output_dir),
             ('seq_amounts', seq_amounts),
             ('injection_rates', injection_rates),
@@ -107,10 +108,6 @@ class DatasetGenerator:
         if not os.path.exists(master):
             raise FileNotFoundError(f"master_fasta not found: {master}")
 
-        genome = params.get('genome_fasta')
-        if genome and not os.path.exists(genome):
-            raise FileNotFoundError(f"genome_fasta not found: {genome}")
-
         # Exactly one of pfm, ppm, consensus must be provided
         sources = [
             bool(params.get('pfm')),
@@ -130,22 +127,6 @@ class DatasetGenerator:
         #if we pass validations, need to update the config with these values
         self.dataset_manager.update_dataset_generation_params(params)
         #TODO: this might need to be handled differently since we are overwriting the config
-
-        # background types must not be empty and all values must be within the allowed set:
-        # 'random'
-        # 'genomic' - requires genome_fasta
-        # 'gc' - requires genome_fasta
-        # 'custom' - requires background_length
-        # allowed_bg_types = {'random', 'genomic', 'gc', 'custom'}
-        # bg_types = params.get('background_types', [])
-        # if not bg_types or not all(t in allowed_bg_types for t in bg_types):
-        #     raise ValueError(f"background_types must be one of: {', '.join(sorted(allowed_bg_types))}")
-        # if 'genomic' in bg_types and not genome:
-        #     raise ValueError("genomic background type requires genome_fasta to be provided")
-        # if 'gc' in bg_types and not genome:
-        #     raise ValueError("gc background type requires genome_fasta to be provided")
-        # if 'custom' in bg_types and not params.get('background_length'):
-        #     raise ValueError("custom background type requires background_length to be provided")
 
         # instantiate generators
         master_fastap = FastaPlus(fname=master)
