@@ -19,6 +19,8 @@ class DatasetManager:
                 self.config = json.load(f)
         # ensure nested params exists
         self.config.setdefault('dataset_generation_params', {})
+        # ensure run_denovo params exists
+        self.config.setdefault('run_denovo_params', {})
 
     def get_combo_name(self, seq_amount: int, injection_rate: float) -> str:
         """Generate a unique name for the combination based on seq_amount and injection_rate."""
@@ -153,3 +155,38 @@ class DatasetManager:
         with open(self.config_path, 'w') as f:
             json.dump(self.config, f, indent=4)
         #TODO: think of a better way to handle this, since this will overwrite any existing params
+    
+    def get_match_params(self) -> dict:
+        """Retrieve the match parameters from the config."""
+        return self.config.get('match_params', {})
+    
+    def update_match_params(self, params: dict) -> None:
+        """Update the match parameters in the config."""
+        self.config['match_params'] = params
+        # Save the updated config to file
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
+        #TODO: think of a better way to handle this, since this will overwrite any existing params
+    
+    def get_injected_motif(self) -> Optional[MotifPlus]:
+        generation_params = self.get_dataset_generation_params()
+        if not generation_params:
+            raise ValueError("No dataset generation parameters found in config")
+        # check that at least one of pfm, ppm, or consensus is provided
+        if not any(key in generation_params for key in ['pfm', 'ppm', 'consensus']):
+            raise ValueError("Exactly one of pfm, ppm, or consensus must be provided in dataset generation parameters")
+        
+        motifp = MotifPlus(
+            pfm=generation_params.get('pfm'),
+            ppm=generation_params.get('ppm'),
+            consensus=generation_params.get('consensus'),
+            mutation_rate=generation_params.get('mutation_rate', 0.0)
+        )
+        if motifp:
+            return motifp
+        else:
+            raise ValueError("No valid motif data found in dataset generation parameters")
+        
+    def get_output_dir(self) -> str:
+        """Retrieve the output directory from the dataset generation parameters."""
+        return self.get_dataset_generation_params().get('output_dir', '')

@@ -27,6 +27,7 @@ class DenovoRunner:
             bg_type: os.path.join(gimme_out_dir, 'intermediate', f'stats.{bg_type}.txt')
             for bg_type in self.params.get('background_types', [])
         }
+        replicate['images_dir'] = os.path.join(gimme_out_dir, 'images')
         return replicate
 
     def _run_denovo_on_single_replicate(
