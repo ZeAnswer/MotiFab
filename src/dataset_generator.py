@@ -130,13 +130,9 @@ class DatasetGenerator:
 
         # instantiate generators
         master_fastap = FastaPlus(fname=master)
-        motifp = MotifPlus(
-            pfm=params.get('pfm'),
-            ppm=params.get('ppm'),
-            consensus=params.get('consensus'),
-            mutation_rate=params.get('mutation_rate', 0.0)
-        )
-            
+        motifp = self.dataset_manager.get_injected_motif()
+        if not motifp:
+            raise ValueError("No valid motif data found")
         # Ensure output directory exists
         output_dir = params.get('output_dir')
         if not output_dir:
@@ -166,12 +162,6 @@ class DatasetGenerator:
    
    # Example usage:
 if __name__ == "__main__":
-    manager = DatasetManager('/polio/oded/MotiFabEnv/gimmeMotifs_py_testing/dataset_config.json')
+    manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
     generator = DatasetGenerator(manager)
-    combinations = generator.generate_datasets(
-    )
-    print("Generated combinations:")
-    for name, entry in combinations.items():
-        print(f"{name}: {entry['seq_amount']} sequences, {entry['injection_rate']} injection rate")
-        for rep_name, rep in entry['replicates'].items():
-            print(f"  {rep_name}: {rep['test_fasta']}")
+    combinations = generator.generate_datasets()
