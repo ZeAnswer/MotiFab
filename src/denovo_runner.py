@@ -27,7 +27,7 @@ class DenovoRunner:
             bg_type: os.path.join(gimme_out_dir, 'intermediate', f'stats.{bg_type}.txt')
             for bg_type in self.params.get('background_types', [])
         }
-        replicate['images_dir'] = os.path.join(gimme_out_dir, 'images')
+        # replicate['images_dir'] = os.path.join(gimme_out_dir, 'images')
         return replicate
 
     def _run_denovo_on_single_replicate(
@@ -188,7 +188,7 @@ class DenovoRunner:
 
    # Example usage:
 if __name__ == "__main__":
-    manager = DatasetManager('/polio/oded/MotiFabEnv/gimmeMotifs_py_testing/dataset_config.json')
+    manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
     runner = DenovoRunner(manager)
     try:
         runner.run_denovo(

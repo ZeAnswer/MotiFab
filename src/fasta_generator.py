@@ -14,93 +14,37 @@ Background Types and Requirements:
 """
 import os
 import sys
-import argparse
 
 # Ensure local src directory is on path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from gimmemotifs_plus.background_plus import create_background_file_plus
+from dataset_manager import DatasetManager
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Create background FASTA or BED files using GimmeMotifs+, with 'true_random' support."
-    )
-    parser.add_argument(
-        "outfile",
-        help="Output file path for background sequences"
-    )
-    parser.add_argument(
-        "-t", "--type",
-        dest="bg_type",
-        choices=["gc", "genomic", "random", "promoter", "true_random"],
-        required=True,
-        help="Background type: gc, genomic, random, promoter, or true_random"
-    )
-    parser.add_argument(
-        "-f", "--fmt",
-        dest="fmt",
-        choices=["fasta", "bed"],
-        default="fasta",
-        help="Output format (default: fasta)"
-    )
-    parser.add_argument(
-        "-s", "--size",
-        dest="size",
-        type=int,
-        help="Length of generated sequences; default is inferred if not provided"
-    )
-    parser.add_argument(
-        "-g", "--genome",
-        dest="genome",
-        help="Genome identifier or FASTA for genomic/promoter backgrounds"
-    )
-    parser.add_argument(
-        "-i", "--inputfile",
-        dest="inputfile",
-        help="Input FASTA or BED file for gc or other background types"
-    )
-    parser.add_argument(
-        "-n", "--number",
-        dest="number",
-        type=int,
-        default=10000,
-        help="Number of sequences to generate (default: 10000)"
-    )
-    parser.add_argument(
-        "--gc_content",
-        dest="gc_content",
-        type=float,
-        default=0.5,
-        help="GC content for true_random background (0-1, default: 0.5)"
-    )
+class FastaGenerator:
+    """
+    Generates background FASTA/BED using parameters from DatasetManager.
+    """
+    def __init__(self, dataset_manager: DatasetManager):
+        self.dm = dataset_manager
+        self.params = self.dm.get_fasta_generation_params()
 
-    args = parser.parse_args()
-
-    # Validate required arguments per background type
-    if args.bg_type == "random" and not args.inputfile:
-        parser.error("'random' background requires --inputfile <FASTA> to build Markov model.")
-    if args.bg_type == "genomic" and not args.genome:
-        parser.error("'genomic' background requires --genome <GENOME>.")
-    # 'gc' accepts either a provided FASTA or a desired GC content, but always needs a genome
-    if args.bg_type == "gc":
-        if not args.genome or (not args.inputfile and args.gc_content is None):
-            parser.error("'gc' background requires --genome <GENOME> and either --inputfile <FASTA> or --gc_content.")
-    if args.bg_type == "promoter":
-        if not args.genome:
-            parser.error("'promoter' background requires --genome <GENOME>.")
-    if args.bg_type == "true_random" and not (0 <= args.gc_content <= 1):
-        parser.error("'true_random' background requires --gc_content between 0 and 1.")
-
-    create_background_file_plus(
-        outfile=args.outfile,
-        bg_type=args.bg_type,
-        fmt=args.fmt,
-        size=args.size,
-        genome=args.genome,
-        inputfile=args.inputfile,
-        number=args.number,
-        gc_content=args.gc_content
-    )
+    def generate(self):
+        """Call create_background_file_plus with JSON-driven parameters."""
+        create_background_file_plus(**self.params)
+        # record the generated background as the new 'master_fasta'
+        outfile = self.params.get('outfile')
+        if outfile:
+            # update dataset_generation_params.master_fasta in the JSON
+            dgen = self.dm.get_dataset_generation_params()
+            dgen['master_fasta'] = outfile
+            self.dm.update_dataset_generation_params(dgen)
+        return
 
 if __name__ == "__main__":
-    main()
+    # JSON-driven background FASTA/BED generation
+    config_path = "/polio/oded/MotiFabEnv/presentation_run/dataset_config.json"
+    dm = DatasetManager(config_path)
+    fg = FastaGenerator(dm)
+    outfile = fg.generate()
+    print(f"Background file generated: {outfile}")

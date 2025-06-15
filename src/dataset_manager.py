@@ -21,6 +21,18 @@ class DatasetManager:
         self.config.setdefault('dataset_generation_params', {})
         # ensure run_denovo params exists
         self.config.setdefault('run_denovo_params', {})
+        # ensure match params exists
+        self.config.setdefault('match_params', {})
+        # ensure fasta generation params exists
+        self.config.setdefault('fasta_generation_params', {})
+        # ensure result parser params exists
+        self.config.setdefault('result_parser_params', {})
+        # ensure parsed results placeholder exists
+        self.config.setdefault('parsed_results', {})
+        # ensure heatmaps generator params exists
+        self.config.setdefault('heatmaps_generator_params', {})
+        # ensure generated heatmap placeholder exists
+        self.config.setdefault('generated_heatmap', {})
 
     def get_combo_name(self, seq_amount: int, injection_rate: float) -> str:
         """Generate a unique name for the combination based on seq_amount and injection_rate."""
@@ -159,6 +171,48 @@ class DatasetManager:
     def get_match_params(self) -> dict:
         """Retrieve the match parameters from the config."""
         return self.config.get('match_params', {})
+    def get_result_parser_params(self) -> dict:
+        """Retrieve result parser parameters from the config."""
+        return self.config.get('result_parser_params', {})
+    def update_result_parser_params(self, params: dict) -> None:
+        """Update result parser parameters in the config."""
+        self.config['result_parser_params'] = params
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
+    def get_parsed_results(self) -> dict:
+        """Retrieve parsed results file paths from the config."""
+        return self.config.get('parsed_results', {})
+    def update_parsed_results(self, results: dict) -> None:
+        """Update parsed results file paths in the config."""
+        self.config['parsed_results'] = results
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
+    def get_heatmaps_generator_params(self) -> dict:
+        """Retrieve heatmaps generator parameters from the config."""
+        return self.config.get('heatmaps_generator_params', {})
+    def update_heatmaps_generator_params(self, params: dict) -> None:
+        """Update heatmaps generator parameters in the config."""
+        self.config['heatmaps_generator_params'] = params
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
+    def get_generated_heatmap(self) -> dict:
+        """Retrieve generated heatmap file paths from the config."""
+        return self.config.get('generated_heatmap', {})
+    def update_generated_heatmap(self, results: dict) -> None:
+        """Update generated heatmap file paths in the config."""
+        self.config['generated_heatmap'] = results
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
+    
+    def get_fasta_generation_params(self) -> dict:
+        """Retrieve the fasta generation parameters from the config."""
+        return self.config.get('fasta_generation_params', {})
+
+    def update_fasta_generation_params(self, params: dict) -> None:
+        """Update the fasta generation parameters in the config."""
+        self.config['fasta_generation_params'] = params
+        with open(self.config_path, 'w') as f:
+            json.dump(self.config, f, indent=4)
     
     def update_match_params(self, params: dict) -> None:
         """Update the match parameters in the config."""
@@ -190,3 +244,41 @@ class DatasetManager:
     def get_output_dir(self) -> str:
         """Retrieve the output directory from the dataset generation parameters."""
         return self.get_dataset_generation_params().get('output_dir', '')
+    
+    def report_missing_outputs(self) -> dict:
+        """
+        Check all replicates for missing de-novo and stats output files.
+        Returns a dict with count of replicates missing any file and list of their names.
+        """
+        missing = []
+        # iterate combinations and replicates
+        for combo in self.config.get('combinations', {}).values():
+            for rep_name, rep in combo.get('replicates', {}).items():
+                # collect expected file paths
+                paths = []
+                # primary de-novo motif file
+                if rep.get('gimme_denovo'):
+                    paths.append(rep['gimme_denovo'])
+                # combined motifs file
+                if rep.get('all_motifs'):
+                    paths.append(rep['all_motifs'])
+                # stats files
+                for p in rep.get('gimme_stats', {}).values():
+                    paths.append(p)
+                for p in rep.get('all_motifs_stats', {}).values():
+                    paths.append(p)
+                # check existence
+                missing_any = False
+                for p in paths:
+                    if not p or not os.path.exists(p):
+                        missing_any = True
+                        break
+                if missing_any:
+                    missing.append(rep_name)
+        return {'missing_count': len(missing), 'missing_replicates': missing}
+    
+if __name__ == "__main__":
+    # Example usage
+    config_path = "/polio/oded/MotiFabEnv/presentation_run/dataset_config.json"
+    dataset_manager = DatasetManager(config_path)
+    print(dataset_manager.report_missing_outputs())

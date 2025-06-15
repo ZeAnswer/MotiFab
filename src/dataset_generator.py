@@ -162,12 +162,6 @@ class DatasetGenerator:
    
    # Example usage:
 if __name__ == "__main__":
-    manager = DatasetManager('/polio/oded/MotiFabEnv/gimmeMotifs_py_testing/dataset_config.json')
+    manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
     generator = DatasetGenerator(manager)
-    combinations = generator.generate_datasets(
-    )
-    print("Generated combinations:")
-    for name, entry in combinations.items():
-        print(f"{name}: {entry['seq_amount']} sequences, {entry['injection_rate']} injection rate")
-        for rep_name, rep in entry['replicates'].items():
-            print(f"  {rep_name}: {rep['test_fasta']}")
+    combinations = generator.generate_datasets()

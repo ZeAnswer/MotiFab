@@ -1,9 +1,14 @@
+import os
+import json
+import csv
 from dataset_manager import DatasetManager
 from gimmemotifs_plus.motif_plus import MotifPlus
 from gimmemotifs.comparison import MotifComparer
 class ResultsParser:
     def __init__(self, dataset_manager: DatasetManager):
         self.dataset_manager = dataset_manager
+        # load parser params from config
+        self.parser_params = dataset_manager.get_result_parser_params().get('dumps', [])
         self.injected_motif = dataset_manager.get_injected_motif()
         # results structure: replicate_name -> motif_id -> data dict
         self.results: dict[str, dict[str, dict]] = {}
@@ -29,6 +34,7 @@ class ResultsParser:
         Load all discovered motifs for each replicate into self.results.
         Uses gimmeMotifs read_motifs(as_dict=True).
         """
+        import os
         from gimmemotifs.motif.read import read_motifs
         # iterate replicates
         for rep in self._all_reps:
@@ -37,28 +43,42 @@ class ResultsParser:
             # load primary denovo motifs
             gimme_fp = rep.get('gimme_denovo')
             if gimme_fp:
-                motifs = read_motifs(gimme_fp, as_dict=True)
-                for mid, mobj in motifs.items():
-                    self.results[name][mid] = {
-                        'motif': mobj,
-                        'stats': {},
-                        'image_path': None,
-                        'tool': self._get_tool_name_from_motif_id(mid),
-                        'match': {}
-                    }
+                if not os.path.exists(gimme_fp):
+                    print(f"Warning: de-novo motif file not found for {name}: {gimme_fp}")
+                else:
+                    try:
+                        motifs = read_motifs(gimme_fp, as_dict=True)
+                    except Exception as e:
+                        print(f"Warning: failed to read de-novo motifs for {name}: {e}")
+                    else:
+                        for mid, mobj in motifs.items():
+                            self.results[name][mid] = {
+                                'motif': mobj,
+                                'stats': {},
+                                'image_path': None,
+                                'tool': self._get_tool_name_from_motif_id(mid),
+                                'match': {}
+                            }
             # load combined motifs
             all_fp = rep.get('all_motifs')
             if all_fp:
-                extra = read_motifs(all_fp, as_dict=True)
-                for mid, mobj in extra.items():
-                    if mid not in self.results[name]:
-                        self.results[name][mid] = {
-                            'motif': mobj,
-                            'stats': {},
-                            # 'image_path': None,
-                            'tool': self._get_tool_name_from_motif_id(mid),
-                            'match': {}
-                        }
+                if not os.path.exists(all_fp):
+                    print(f"Warning: combined motifs file not found for {name}: {all_fp}")
+                else:
+                    try:
+                        extra = read_motifs(all_fp, as_dict=True)
+                    except Exception as e:
+                        print(f"Warning: failed to read combined motifs for {name}: {e}")
+                    else:
+                        for mid, mobj in extra.items():
+                            if mid not in self.results[name]:
+                                self.results[name][mid] = {
+                                    'motif': mobj,
+                                    'stats': {},
+                                    # 'image_path': None,
+                                    'tool': self._get_tool_name_from_motif_id(mid),
+                                    'match': {}
+                                }
         return self.results
 
     def populate_stats(self):
@@ -264,25 +284,33 @@ class ResultsParser:
                     ])
         return path
     
+    def run_all(self):
+        """
+        Execute full parsing workflow: load motifs, stats, matches, dump CSVs per config,
+        and update parsed_results in JSON.
+        Returns a dict of parsed result metadata.
+        """
+        # load and process
+        self.load_motifs()
+        self.populate_stats()
+        self.populate_matches()
+        # generate CSVs as per parser_params
+        parsed = {}
+        for entry in self.parser_params:
+            fname = entry.get('filename')
+            only_matches = entry.get('only_matches', False)
+            only_sig = entry.get('only_significant', False)
+            path = self.dump_to_csv(fname, only_matches, only_sig)
+            parsed[fname] = {'path': path, 'only_matches': only_matches, 'only_significant': only_sig}
+        # update config
+        self.dataset_manager.update_parsed_results(parsed)
+        return parsed
+    
     
 if __name__ == "__main__":
-    manager = DatasetManager('/polio/oded/MotiFabEnv/gimmeMotifs_py_testing/dataset_config.json')
+    # JSON-driven parsing workflow
+    manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
     parser = ResultsParser(manager)
-    motifs = parser.load_motifs()
-    stats = parser.populate_stats()
-    matches = parser.populate_matches()
-    parser.dump_to_csv('all_discovered_motifs.csv')
-    parser.dump_to_csv('matched_discovered_motifs.csv', only_matches=True)
-    parser.dump_to_csv('significant_matched_motifs.csv', only_matches=True, only_significant=True)
-    # print("Loaded motifs:", motifs)
-    # print("Populated stats:", stats)
-    # print("Populated matches:", matches)
-    #print the first replicate results
-    # for rep_name, rep_data in matches.items():
-    #     print(f"Replicate: {rep_name}")
-    #     for mid, data in rep_data.items():
-    #         print(f"  Motif ID: {mid}, Tool: {data['tool']}, Match Score: {data['match']['score']}, Is Match: {data['match']['is_match']}")
-    #         print(f"  Stats: {data['stats']}")
-    #         # print(f"  Image Path: {data['image_path']}")  # Uncomment if images are populated
-    #     print()
-    
+    results = parser.run_all()
+    print(f"Parsed results updated: {results}")
+        
