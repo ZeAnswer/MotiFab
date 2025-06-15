@@ -28,6 +28,34 @@ class MotifPlus(Motif):
         mutation_rate: float = 0.0,
         places: int = 4
     ):
+        # If pfm or ppm args are file paths, load the matrix from file
+        import os
+        def _read_matrix(path):
+            mat = []
+            with open(path) as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line or line.startswith('>'):
+                        continue
+                    parts = line.split()
+                    try:
+                        row = [float(x) for x in parts]
+                    except ValueError:
+                        continue
+                    mat.append(row)
+            # some PFM/PPM files store rows as nucleotides (4 rows x L cols)
+            # transpose into L rows x 4 cols if needed
+            if len(mat) == 4 and len(mat[0]) != 4:
+                mat = [list(col) for col in zip(*mat)]
+            return mat
+        # load pfm if given as filepath
+        if isinstance(pfm, str) and os.path.isfile(pfm):
+            pfm = _read_matrix(pfm)
+            ppm = None
+        # load ppm if given as filepath
+        if isinstance(ppm, str) and os.path.isfile(ppm):
+            ppm = _read_matrix(ppm)
+            pfm = None
         # If consensus provided, build ppm and delegate
         if consensus is not None:
             # Validate consensus
@@ -92,3 +120,10 @@ class MotifPlus(Motif):
             ppm.append([v / total for v in vals])
         return cls(pfm=None, ppm=ppm)
 
+
+
+if __name__ == "__main__":
+    pfm_path = '/polio/oded/MotiFabEnv/presentation_run/versions.pfm'
+    motif = MotifPlus(pfm=pfm_path)
+    print(f"Motif ID: {motif.id}")
+    print(f"Motif Consensus: {motif.to_consensus()}")
