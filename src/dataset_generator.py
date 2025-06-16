@@ -9,11 +9,19 @@ class DatasetGenerator:
         self.dataset_manager = dataset_manager
         self.params = dataset_manager.get_dataset_generation_params()
         
-    def generate_combo(self, fastap: FastaPlus, motifp: MotifPlus, seq_amount: int, injection_rate: float, force = False):
-        # TODO: implement force logic to avoid generating existing combinations
+    def generate_combo(self, fastap: FastaPlus, motifp: MotifPlus, seq_amount: int, injection_rate: float, force: bool = False):
+        """
+        Generate a single combination unless force=False and it already exists.
+        """
+        mngr = self.dataset_manager
+        combo_name = mngr.get_combo_name(seq_amount, injection_rate)
+        existing = mngr.get_combo(seq_amount, injection_rate)
+        # Skip if already generated and no force flag
+        if existing and not force and not existing.get('force', False):
+            print(f"Skipping existing combination {combo_name} (use force to override)")
+            return existing
         # retrieve generation parameters
         params = self.params
-        mngr = self.dataset_manager
         out_dir = params.get('output_dir', '.')
         background_length = params.get('background_length', None)
         n_replicates = params.get('n_replicates', 1)

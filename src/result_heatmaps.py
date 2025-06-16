@@ -129,37 +129,41 @@ class HeatmapGenerator:
         self.parsed = self.dm.get_parsed_results()
 
     def generate(self):
+        """Generate 'all' and 'significant' heatmaps based on parsed CSVs."""
         output_dir = self.hp.get('output_dir', '')
-        only_sig_list = self.hp.get('only_significant', [False])
+        if output_dir and not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
         generated = {}
-        # parameters for axes
-        dataset_lengths = self.dgp.get('seq_amounts', [])
-        injection_rates = self.dgp.get('injection_rates', [])
-        replicates = list(range(1, self.dgp.get('n_replicates', 1) + 1))
-        tools = self.rdp.get('tools', []) + ['GimmeMotifs']
-        backgrounds = self.rdp.get('background_types', [])
-        # iterate over only_significant options
-        for only_sig in only_sig_list:
-            # find CSV path for overall results
-            csv_name = None
-            for fname, meta in self.parsed.items():
-                if not meta.get('only_matches') and meta.get('only_significant') == only_sig:
-                    csv_name = fname
-                    break
-            if not csv_name:
+        # locate all- and sig-specific CSV paths
+        csv_all = None
+        csv_sig = None
+        for fname, meta in self.parsed.items():
+            if meta.get('only_matches', False):
                 continue
-            csv_path = self.parsed[csv_name]['path']
-            # call plotting
-            suffix = '_sig' if only_sig else ''
+            if meta.get('only_significant', False):
+                csv_sig = meta.get('path')
+            else:
+                csv_all = meta.get('path')
+        # create 'all' heatmap
+        if csv_all:
             plot_discovery_heatmaps(
-                csv_path=csv_path,
+                csv_path=csv_all,
                 output_dir=output_dir,
-                only_significant=only_sig,
-                save_heatmap=True
+                only_significant=False
             )
-            out_file = os.path.join(output_dir, f"discovery_heatmaps{suffix}.png")
-            generated[suffix if only_sig else 'all'] = {'path': out_file, 'only_significant': only_sig}
-        # update config
+            out_all = os.path.join(output_dir, 'discovery_heatmaps.png')
+            generated['all'] = {'path': out_all, 'only_significant': False}
+        # create 'sig' heatmap - prefer dedicated CSV, else filter all
+        src = csv_sig or csv_all
+        if src:
+            plot_discovery_heatmaps(
+                csv_path=src,
+                output_dir=output_dir,
+                only_significant=True
+            )
+            out_sig = os.path.join(output_dir, 'discovery_heatmaps_sig.png')
+            generated['sig'] = {'path': out_sig, 'only_significant': True}
+        # update JSON config
         self.dm.update_generated_heatmap(generated)
         return generated
 
@@ -170,3 +174,4 @@ if __name__ == '__main__':
     hg = HeatmapGenerator(dm)
     generated = hg.generate()
     print(f"Generated heatmaps: {generated}")
+        # update config

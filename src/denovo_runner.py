@@ -122,7 +122,9 @@ class DenovoRunner:
             ('background_types', background_types),
             ('ncpus', ncpus),
             ('tools', tools),
-            ('max_parallel', max_parallel)
+            ('max_parallel', max_parallel),
+            ('rerun_failed', rerun_failed),
+            ('force', force)
         ]:
             if val is not None:
                 params[key] = val
@@ -137,8 +139,8 @@ class DenovoRunner:
             val = params.get(param)
             if not val:
                 raise ValueError(f"{param} must be provided via configuration or parameter")
-            
-        #if we pass validations, need to update the config with these values
+        
+    #if we pass validations, need to update the config with these values
         self.dataset_manager.update_denovo_params(params)
         #TODO: this might need to be handled differently since we are overwriting the config
 
@@ -172,19 +174,34 @@ class DenovoRunner:
             'keep_intermediate': True,
         }
         
+        # determine which replicates to run
+        force_all = params.get('force', False)
+        rerun_failed_flag = params.get('rerun_failed', False)
         # Get all replicates from the dataset manager
         replicates = self.dataset_manager.get_all_reps()
         if not replicates:
             raise ValueError("No replicates found in the dataset manager")
-        include_status = ['generated']
-        if rerun_failed:
-            include_status.append('failed_denovo')
-        # Filter replicates based on status
-        replicates = [rep for rep in replicates if rep.get('status') in include_status]
+        # only include reps that need running
+        statuses = ['generated']
+        if rerun_failed_flag:
+            statuses.append('failed_denovo')
+        filtered = []
+        for rep in replicates:
+            if force_all or rep.get('force', False):
+                filtered.append(rep)
+            elif rep.get('status') in statuses:
+                filtered.append(rep)
+        replicates = filtered
         if not replicates:
-            raise ValueError("No replicates found with status 'generated' or 'failed_denovo'")
+            raise ValueError("No replicates to run denovo")
+
         # Run denovo motif discovery in parallel
-        self._denovo_parallel_runner(replicates, run_params, max_parallel=params.get('max_parallel', 5), delay=1000)
+        self._denovo_parallel_runner(
+            replicates,
+            run_params,
+            max_parallel=params.get('max_parallel', 5),
+            delay=1000
+        )
 
    # Example usage:
 if __name__ == "__main__":
