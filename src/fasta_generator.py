@@ -9,6 +9,7 @@ Background Types and Requirements:
   genomic      - genomic sequences randomly sampled. Requires --genome <GENOME>.
   gc           - genomic sequences matching GC% of input FASTA.
                   Requires both --genome <GENOME> and --inputfile <FASTA>.
+                  If inputfile is not provided, uses specified --gc_content (0-1).
   promoter     - random promoter regions. Requires --genome <GENOME> and <genome>.bed file.
   true_random  - truly random sequences. Optionally specify --gc_content (0-1).
 """
