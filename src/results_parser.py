@@ -9,7 +9,7 @@ class ResultsParser:
         self.dataset_manager = dataset_manager
         # load parser params from config
         self.parser_params = dataset_manager.get_result_parser_params().get('dumps', [])
-        self.injected_motif = dataset_manager.get_injected_motif()
+        self.injected_motif = dataset_manager.get_motifp()
         # results structure: replicate_name -> motif_id -> data dict
         self.results: dict[str, dict[str, dict]] = {}
         # preload all replicate metadata
@@ -307,10 +307,10 @@ class ResultsParser:
         return parsed
     
     
-if __name__ == "__main__":
-    # JSON-driven parsing workflow
-    manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
-    parser = ResultsParser(manager)
-    results = parser.run_all()
-    print(f"Parsed results updated: {results}")
+# if __name__ == "__main__":
+#     # JSON-driven parsing workflow
+#     manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
+#     parser = ResultsParser(manager)
+#     results = parser.run_all()
+#     print(f"Parsed results updated: {results}")
         

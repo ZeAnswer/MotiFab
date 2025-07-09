@@ -1,7 +1,7 @@
 import sys
 import logging
 from gimmemotifs.background import create_background_file as _create_bg
-from .fasta_plus import FastaPlus
+from gimmemotifs_plus import FastaPlus
 
 logger = logging.getLogger("gimmemotifs_plus.background")
 
@@ -23,6 +23,7 @@ def create_background_file_plus(
     Parameters are the same as create_background_file, plus:
     - gc_content (float): GC proportion for 'true_random' backgrounds (0-1).
     """
+    #TODO: seen somewhere that there's a way to set promoters size, pre TSS and post TSS, look into it
     fmt = fmt.lower()
     if fmt in ["fa", "fsa"]:
         fmt = "fasta"
@@ -100,3 +101,14 @@ def create_background_file_plus(
     else:
         # Delegate to original implementation for other types
         return _create_bg(outfile, bg_type, fmt, size, genome, inputfile, number)
+
+
+#usage example:
+# if __name__ == "__main__":
+#     create_background_file_plus(
+#         outfile="/polio/oded/genomes/hg38background.fa",
+#         bg_type="genomic",
+#         genome="/polio/oded/genomes/hg38/hg38.fa",
+#         number=100,
+#         size=100 #in case of genomic/promoter, either an inputfile or size must be provided
+# )

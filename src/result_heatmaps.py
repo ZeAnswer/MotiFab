@@ -123,14 +123,12 @@ class HeatmapGenerator:
     """
     def __init__(self, dataset_manager: DatasetManager):
         self.dm = dataset_manager
-        self.dgp = self.dm.get_dataset_generation_params()
-        self.rdp = self.dm.get_denovo_params()
-        self.hp = self.dm.get_heatmaps_generator_params()
+        self.heatmaps_params = self.dm.get_heatmaps_generator_params()
         self.parsed = self.dm.get_parsed_results()
 
     def generate(self):
         """Generate 'all' and 'significant' heatmaps based on parsed CSVs."""
-        output_dir = self.hp.get('output_dir', '')
+        output_dir = self.heatmaps_params.get('output_dir', '')
         if output_dir and not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
         generated = {}
@@ -167,11 +165,11 @@ class HeatmapGenerator:
         self.dm.update_generated_heatmap(generated)
         return generated
 
-if __name__ == '__main__':
-    # JSON-driven heatmap generation
-    config_path = '/polio/oded/MotiFabEnv/presentation_run/dataset_config.json'
-    dm = DatasetManager(config_path)
-    hg = HeatmapGenerator(dm)
-    generated = hg.generate()
-    print(f"Generated heatmaps: {generated}")
-        # update config
+# if __name__ == '__main__':
+#     # JSON-driven heatmap generation
+#     config_path = '/polio/oded/MotiFabEnv/presentation_run/dataset_config.json'
+#     dm = DatasetManager(config_path)
+#     hg = HeatmapGenerator(dm)
+#     generated = hg.generate()
+#     print(f"Generated heatmaps: {generated}")
+#         # update config

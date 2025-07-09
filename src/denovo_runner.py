@@ -103,7 +103,7 @@ class DenovoRunner:
 
     def run_denovo(
         self,
-        genome_fasta: Optional[str] = None,
+        genome: Optional[str] = None,
         background_types: Optional[List[str]] = None,
         ncpus: Optional[int] = 10,
         tools: Optional[List[str]] = ["BioProspector", "MEME", "Homer"],
@@ -118,7 +118,7 @@ class DenovoRunner:
         # Merge provided parameters into nested config
         params = self.params
         for key, val in [
-            ('genome_fasta', genome_fasta),
+            ('genome', genome),
             ('background_types', background_types),
             ('ncpus', ncpus),
             ('tools', tools),
@@ -129,9 +129,13 @@ class DenovoRunner:
             if val is not None:
                 params[key] = val
 
-        genome = params.get('genome_fasta')
-        if genome and not os.path.exists(genome):
-            raise FileNotFoundError(f"genome_fasta not found: {genome}")
+        genome_real = params.get('genome')
+        print(f"Running denovo motif discovery with genome: {genome_real}, "
+              f"background_types: {params.get('background_types')}, "
+              f"ncpus: {ncpus}, tools: {tools}, max_parallel: {max_parallel}, "
+              f"rerun_failed: {rerun_failed}, force: {force}")
+        # if genome and not os.path.exists(genome):
+        #     raise FileNotFoundError(f"genome not found: {genome}")
 
         # Required parameters
         # required denovo params
@@ -141,7 +145,7 @@ class DenovoRunner:
                 raise ValueError(f"{param} must be provided via configuration or parameter")
         
     #if we pass validations, need to update the config with these values
-        self.dataset_manager.update_denovo_params(params)
+        self.dataset_manager.update_denovo_params(params) #TODO: again with the config update? marked for destruction
         #TODO: this might need to be handled differently since we are overwriting the config
 
         # background types must not be empty and all values must be within the allowed set:
@@ -149,15 +153,17 @@ class DenovoRunner:
         # 'genomic' - requires genome_fasta
         # 'gc' - requires genome_fasta
         # 'custom' - requires backgrounds to be provided. will be validated later
-        allowed_bg_types = {'random', 'genomic', 'gc', 'custom'}
+        allowed_bg_types = {'random', 'genomic', 'gc', 'custom', 'promoter'}
         bg_types = params.get('background_types', [])
         if not bg_types or not all(t in allowed_bg_types for t in bg_types):
             raise ValueError(f"background_types must be at least one of: {', '.join(sorted(allowed_bg_types))} (string list)")
-        if 'genomic' in bg_types and not genome:
-            raise ValueError("genomic background type requires genome_fasta to be provided")
-        if 'gc' in bg_types and not genome:
-            raise ValueError("gc background type requires genome_fasta to be provided")
-
+        if 'genomic' in bg_types and not genome_real:
+            # print(f"genome is required for genomic background type. seems like it's gone. input genome: {genome}")
+            raise ValueError("genomic background type requires genome to be provided")
+        if 'gc' in bg_types and not genome_real:
+            raise ValueError("gc background type requires genome to be provided")
+        if 'promoter' in bg_types and not genome_real:
+            raise ValueError("promoter background type requires genome to be provided") #TODO: this whole bit needs to be cleaned
         # validate tools
         allowed_tools = {'AMD', 'BioProspector', 'ChIPMunk', 'DiNAMO', 'GADEM', 'HMS', 'Homer', 'Improbizer', 'MDmodule', 'MEME', 'MEMEW', 'MotifSampler', 'Posmo', 'ProSampler', 'Trawler', 'Weeder', 'XXmotif'}
         tools = params.get('tools', [])
@@ -166,7 +172,7 @@ class DenovoRunner:
 
         # Prepare run parameters
         run_params = {
-            'genome': genome,
+            'genome': genome_real,
             'background': ",".join(bg_types),
             'ncpus': ncpus,
             'tools': ",".join(tools),
@@ -204,11 +210,11 @@ class DenovoRunner:
         )
 
    # Example usage:
-if __name__ == "__main__":
-    manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
-    runner = DenovoRunner(manager)
-    try:
-        runner.run_denovo(
-        )
-    except Exception as e:
-        print(f"Error running denovo: {e}")
+# if __name__ == "__main__":
+#     manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
+#     runner = DenovoRunner(manager)
+#     try:
+#         runner.run_denovo(
+#         )
+#     except Exception as e:
+#         print(f"Error running denovo: {e}")

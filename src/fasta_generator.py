@@ -36,16 +36,15 @@ class FastaGenerator:
         # record the generated background as the new 'master_fasta'
         outfile = self.params.get('outfile')
         if outfile:
-            # update dataset_generation_params.master_fasta in the JSON
-            dgen = self.dm.get_dataset_generation_params()
-            dgen['master_fasta'] = outfile
-            self.dm.update_dataset_generation_params(dgen)
+            # update master fasta path in dataset manager
+            self.dm.set_master_fasta(outfile)
+            print(f"Background FASTA generated: {outfile} with params: {self.params}")
         return
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # JSON-driven background FASTA/BED generation
-    config_path = "/polio/oded/MotiFabEnv/presentation_run/dataset_config.json"
-    dm = DatasetManager(config_path)
-    fg = FastaGenerator(dm)
-    outfile = fg.generate()
-    print(f"Background file generated: {outfile}")
+    # config_path = "/polio/oded/MotiFabEnv/presentation_run/dataset_config.json"
+    # dm = DatasetManager(config_path)
+    # fg = FastaGenerator(dm)
+    # outfile = fg.generate()
+    # print(f"Background file generated: {outfile}")
