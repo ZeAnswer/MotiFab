@@ -5,7 +5,15 @@ import pandas as pd
 import numpy as np
 from dataset_manager import DatasetManager
 from sklearn.linear_model import LogisticRegression
+import markdown
+#TODO this file might be getting big
 
+def markdown_to_html(markdown_text):
+    """
+    Convert Markdown text to HTML.
+    """
+    html = markdown.markdown(markdown_text, extensions=['tables'])
+    return html
 
 def generate_report(dm: DatasetManager):
     """
@@ -312,6 +320,18 @@ def generate_report(dm: DatasetManager):
 
         md.write("*End of Report*\n")
     print(f"Report written to {report_path}")
+    
+    # Also generate HTML version
+    with open(report_path, 'r') as f:
+        markdown_content = f.read()
+    
+    html_content = markdown_to_html(markdown_content)
+    html_path = report_path.replace('.md', '.html')
+    
+    with open(html_path, 'w') as f:
+        f.write(html_content)
+    
+    print(f"HTML report written to {html_path}")
 
 # if __name__ == '__main__':
 #     config_path = "/polio/oded/MotiFabEnv/test_run_FOXD1/motifab_config.json"
