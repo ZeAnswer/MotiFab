@@ -38,11 +38,18 @@ def main():
     print(f"Loading configuration: {config_path}")
     dm = DatasetManager(config_path)
 
-    # Step 1: Background FASTA generation
-    print("[1/5] Generating background FASTA...")
-    fg = FastaGenerator(dm)
-    fg.generate()
+    # Should add validations! STEP 0! or done in dataset manager?
 
+    # Step 1: master FASTA generation
+    print("[1/5] Generating master FASTA...")
+    # if master_fasta already provided, ignore this step
+    if not dm.is_master_fasta_provided():
+        print("Master FASTA not provided, generating master FASTA...")
+        fg = FastaGenerator(dm)
+        fg.generate()
+    else:
+        print("Master FASTA already provided, skipping master FASTA generation.")
+        
     # Step 2: Dataset generation
     print("[2/5] Generating datasets...")
     dg = DatasetGenerator(dm)

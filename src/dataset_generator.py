@@ -110,7 +110,7 @@ class DatasetGenerator:
 
         # Validations
         # validation context from nested params
-        master = params.get('master_fasta')
+        master = self.dataset_manager.get_master_fasta()
         if not master:
             raise ValueError("master_fasta must be provided via configuration or parameter")
         if not os.path.exists(master):
@@ -133,12 +133,12 @@ class DatasetGenerator:
                 raise ValueError(f"{param} must be provided via configuration or parameter")
             
         #if we pass validations, need to update the config with these values
-        self.dataset_manager.update_dataset_generation_params(params)
+        self.dataset_manager.update_dataset_generation_params(params) #TODO the hell is this on about? might need to remove completely
         #TODO: this might need to be handled differently since we are overwriting the config
 
         # instantiate generators
         master_fastap = FastaPlus(fname=master)
-        motifp = self.dataset_manager.get_injected_motif()
+        motifp = self.dataset_manager.get_motifp()  # Retrieve motif as MotifPlus object
         if not motifp:
             raise ValueError("No valid motif data found")
         # Ensure output directory exists
@@ -169,7 +169,7 @@ class DatasetGenerator:
    
    
    # Example usage:
-if __name__ == "__main__":
-    manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
-    generator = DatasetGenerator(manager)
-    combinations = generator.generate_datasets()
+# if __name__ == "__main__":
+#     manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
+#     generator = DatasetGenerator(manager)
+#     combinations = generator.generate_datasets()

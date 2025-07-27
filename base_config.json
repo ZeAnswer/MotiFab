@@ -1,0 +1,1849 @@
+{
+    "master_fasta": "full/path/to/master/fasta/file.fasta", // if exists, fasta generation will not be performed
+    "output_dir": "full/path/to/output/dir", // the main output directory for the project, where all results will be stored
+    "motif":{
+        "consensus": "IUPAC consensus sequence",
+        "mutation_rate": 0.05, //in case consensus with only ACTG
+        "pfm": "full/path/to/pfm/file.pfm",
+        "ppm": "full/path/to/ppm/file.ppm", //only 1 of consensus, pfm or ppm should be provided
+    },
+    "combinations_configurations":{
+        "seq_amounts": [
+            80,
+            150,
+            500,
+            1000
+        ],
+        "injection_rates": [
+            0.1,
+            0.3,
+            0.5,
+            0.7
+        ],
+        "n_replicates": 5
+    },
+    "genome_configurations":{
+        "genome": "full/path/to/genome/file.fasta OR <genomepy genome_name (will download genome>",
+        "install_genome": false, //if true, will download the genome from genomepy if it does not exist
+    },
+    "fasta_generation_params": {
+        "name": "optional name for the fasta file (default is master_fasta.fasta)",
+        "bg_type": "random | genomic | gc | promoter | true_random", //if "genomic", "gc", or "promoter", a genome must be provided. if "random", inputfile must be provided. if "true_random", either inputfile or gc_content must be provided. if "genomic" or "promoter", either inputfile or size must be provided.
+        "seq_length": 1000, //length of each sequence in the fasta file
+        "seq_amount": 10000, //number of sequences in the fasta file
+        "inputfile": "full/path/to/input/file.fasta", 
+        "gc_content": 0.5
+    },
+
+    "dataset_generation_params": {
+        "background_length": 1000, //even necessary??
+        "force": false, //if true, will overwrite existing files
+    },
+    "run_denovo_params": {
+        "background_types": [
+            "custom",
+            "genomic",
+            "random",
+            "gc",
+            "promoter"
+        ],
+        "ncpus": 10,
+        "tools": [
+            "BioProspector",
+            "MEME",
+            "Homer",
+            "AMD", "ChIPMunk", "DiNAMO", "DREME", "GADEM", "HMS",
+            "Improbizer", "MDmodule", "MEMEW", "MotifSampler", "Posmo", "ProSampler",
+            "RPMCMC", "Trawler", "Weeder", "XXmotif", "YAMDA"
+        ],
+        "max_parallel": 5,
+        "rerun_failed": false, // is this even implemented?
+        "force": false, //if true, will overwrite existing files
+    },
+    "match_params": {
+        "match": "partial | subtotal | total",
+        "metric": "seqcor | pcc | ed | distance | wic | chisq | akl | ssd",
+        "combine": "mean | sum",
+        "min_score": 0.7
+    },
+    "parsed_results": {},
+    "generated_heatmap": {},
+    "combinations": {
+        "len_80_rate_10": {
+            "name": "len_80_rate_10",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10",
+            "seq_amount": 80,
+            "injection_rate": 0.1,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/background.fa",
+            "replicates": {
+                "len_80_rate_10_rep_1": {
+                    "name": "len_80_rate_10_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/len_80_rate_10_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_10_rep_2": {
+                    "name": "len_80_rate_10_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/len_80_rate_10_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_10_rep_3": {
+                    "name": "len_80_rate_10_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/len_80_rate_10_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_10_rep_4": {
+                    "name": "len_80_rate_10_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/len_80_rate_10_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_10_rep_5": {
+                    "name": "len_80_rate_10_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/len_80_rate_10_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_10/len_80_rate_10_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_80_rate_30": {
+            "name": "len_80_rate_30",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30",
+            "seq_amount": 80,
+            "injection_rate": 0.3,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/background.fa",
+            "replicates": {
+                "len_80_rate_30_rep_1": {
+                    "name": "len_80_rate_30_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/len_80_rate_30_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_30_rep_2": {
+                    "name": "len_80_rate_30_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/len_80_rate_30_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_30_rep_3": {
+                    "name": "len_80_rate_30_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/len_80_rate_30_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_30_rep_4": {
+                    "name": "len_80_rate_30_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/len_80_rate_30_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_30_rep_5": {
+                    "name": "len_80_rate_30_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/len_80_rate_30_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_30/len_80_rate_30_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_80_rate_50": {
+            "name": "len_80_rate_50",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50",
+            "seq_amount": 80,
+            "injection_rate": 0.5,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/background.fa",
+            "replicates": {
+                "len_80_rate_50_rep_1": {
+                    "name": "len_80_rate_50_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/len_80_rate_50_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_50_rep_2": {
+                    "name": "len_80_rate_50_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/len_80_rate_50_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_50_rep_3": {
+                    "name": "len_80_rate_50_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/len_80_rate_50_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_50_rep_4": {
+                    "name": "len_80_rate_50_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/len_80_rate_50_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_50_rep_5": {
+                    "name": "len_80_rate_50_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/len_80_rate_50_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_50/len_80_rate_50_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_80_rate_70": {
+            "name": "len_80_rate_70",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70",
+            "seq_amount": 80,
+            "injection_rate": 0.7,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/background.fa",
+            "replicates": {
+                "len_80_rate_70_rep_1": {
+                    "name": "len_80_rate_70_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/len_80_rate_70_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_70_rep_2": {
+                    "name": "len_80_rate_70_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/len_80_rate_70_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_70_rep_3": {
+                    "name": "len_80_rate_70_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/len_80_rate_70_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_70_rep_4": {
+                    "name": "len_80_rate_70_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/len_80_rate_70_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_80_rate_70_rep_5": {
+                    "name": "len_80_rate_70_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/len_80_rate_70_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_80_rate_70/len_80_rate_70_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_150_rate_10": {
+            "name": "len_150_rate_10",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10",
+            "seq_amount": 150,
+            "injection_rate": 0.1,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/background.fa",
+            "replicates": {
+                "len_150_rate_10_rep_1": {
+                    "name": "len_150_rate_10_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/len_150_rate_10_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_10_rep_2": {
+                    "name": "len_150_rate_10_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/len_150_rate_10_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_10_rep_3": {
+                    "name": "len_150_rate_10_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/len_150_rate_10_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_10_rep_4": {
+                    "name": "len_150_rate_10_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/len_150_rate_10_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_10_rep_5": {
+                    "name": "len_150_rate_10_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/len_150_rate_10_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_10/len_150_rate_10_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_150_rate_30": {
+            "name": "len_150_rate_30",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30",
+            "seq_amount": 150,
+            "injection_rate": 0.3,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/background.fa",
+            "replicates": {
+                "len_150_rate_30_rep_1": {
+                    "name": "len_150_rate_30_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/len_150_rate_30_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_30_rep_2": {
+                    "name": "len_150_rate_30_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/len_150_rate_30_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_30_rep_3": {
+                    "name": "len_150_rate_30_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/len_150_rate_30_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_30_rep_4": {
+                    "name": "len_150_rate_30_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/len_150_rate_30_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_30_rep_5": {
+                    "name": "len_150_rate_30_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/len_150_rate_30_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_30/len_150_rate_30_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_150_rate_50": {
+            "name": "len_150_rate_50",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50",
+            "seq_amount": 150,
+            "injection_rate": 0.5,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/background.fa",
+            "replicates": {
+                "len_150_rate_50_rep_1": {
+                    "name": "len_150_rate_50_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/len_150_rate_50_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_50_rep_2": {
+                    "name": "len_150_rate_50_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/len_150_rate_50_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_50_rep_3": {
+                    "name": "len_150_rate_50_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/len_150_rate_50_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_50_rep_4": {
+                    "name": "len_150_rate_50_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/len_150_rate_50_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_50_rep_5": {
+                    "name": "len_150_rate_50_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/len_150_rate_50_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_50/len_150_rate_50_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_150_rate_70": {
+            "name": "len_150_rate_70",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70",
+            "seq_amount": 150,
+            "injection_rate": 0.7,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/background.fa",
+            "replicates": {
+                "len_150_rate_70_rep_1": {
+                    "name": "len_150_rate_70_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/len_150_rate_70_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_70_rep_2": {
+                    "name": "len_150_rate_70_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/len_150_rate_70_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_70_rep_3": {
+                    "name": "len_150_rate_70_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/len_150_rate_70_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_70_rep_4": {
+                    "name": "len_150_rate_70_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/len_150_rate_70_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_150_rate_70_rep_5": {
+                    "name": "len_150_rate_70_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/len_150_rate_70_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_150_rate_70/len_150_rate_70_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_500_rate_10": {
+            "name": "len_500_rate_10",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10",
+            "seq_amount": 500,
+            "injection_rate": 0.1,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/background.fa",
+            "replicates": {
+                "len_500_rate_10_rep_1": {
+                    "name": "len_500_rate_10_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/len_500_rate_10_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_10_rep_2": {
+                    "name": "len_500_rate_10_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/len_500_rate_10_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_10_rep_3": {
+                    "name": "len_500_rate_10_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/len_500_rate_10_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_10_rep_4": {
+                    "name": "len_500_rate_10_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/len_500_rate_10_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_10_rep_5": {
+                    "name": "len_500_rate_10_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/len_500_rate_10_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_10/len_500_rate_10_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_500_rate_30": {
+            "name": "len_500_rate_30",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30",
+            "seq_amount": 500,
+            "injection_rate": 0.3,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/background.fa",
+            "replicates": {
+                "len_500_rate_30_rep_1": {
+                    "name": "len_500_rate_30_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/len_500_rate_30_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_30_rep_2": {
+                    "name": "len_500_rate_30_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/len_500_rate_30_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_30_rep_3": {
+                    "name": "len_500_rate_30_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/len_500_rate_30_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_30_rep_4": {
+                    "name": "len_500_rate_30_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/len_500_rate_30_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_30_rep_5": {
+                    "name": "len_500_rate_30_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/len_500_rate_30_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_30/len_500_rate_30_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_500_rate_50": {
+            "name": "len_500_rate_50",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50",
+            "seq_amount": 500,
+            "injection_rate": 0.5,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/background.fa",
+            "replicates": {
+                "len_500_rate_50_rep_1": {
+                    "name": "len_500_rate_50_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/len_500_rate_50_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_50_rep_2": {
+                    "name": "len_500_rate_50_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/len_500_rate_50_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_50_rep_3": {
+                    "name": "len_500_rate_50_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/len_500_rate_50_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_50_rep_4": {
+                    "name": "len_500_rate_50_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/len_500_rate_50_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_50_rep_5": {
+                    "name": "len_500_rate_50_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/len_500_rate_50_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_50/len_500_rate_50_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_500_rate_70": {
+            "name": "len_500_rate_70",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70",
+            "seq_amount": 500,
+            "injection_rate": 0.7,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/background.fa",
+            "replicates": {
+                "len_500_rate_70_rep_1": {
+                    "name": "len_500_rate_70_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/len_500_rate_70_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_70_rep_2": {
+                    "name": "len_500_rate_70_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/len_500_rate_70_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_70_rep_3": {
+                    "name": "len_500_rate_70_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/len_500_rate_70_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_70_rep_4": {
+                    "name": "len_500_rate_70_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/len_500_rate_70_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_500_rate_70_rep_5": {
+                    "name": "len_500_rate_70_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/len_500_rate_70_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_500_rate_70/len_500_rate_70_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_1000_rate_10": {
+            "name": "len_1000_rate_10",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10",
+            "seq_amount": 1000,
+            "injection_rate": 0.1,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/background.fa",
+            "replicates": {
+                "len_1000_rate_10_rep_1": {
+                    "name": "len_1000_rate_10_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/len_1000_rate_10_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_10_rep_2": {
+                    "name": "len_1000_rate_10_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/len_1000_rate_10_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_10_rep_3": {
+                    "name": "len_1000_rate_10_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/len_1000_rate_10_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_10_rep_4": {
+                    "name": "len_1000_rate_10_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/len_1000_rate_10_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_10_rep_5": {
+                    "name": "len_1000_rate_10_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/len_1000_rate_10_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_10/len_1000_rate_10_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_1000_rate_30": {
+            "name": "len_1000_rate_30",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30",
+            "seq_amount": 1000,
+            "injection_rate": 0.3,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/background.fa",
+            "replicates": {
+                "len_1000_rate_30_rep_1": {
+                    "name": "len_1000_rate_30_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/len_1000_rate_30_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_30_rep_2": {
+                    "name": "len_1000_rate_30_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/len_1000_rate_30_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_30_rep_3": {
+                    "name": "len_1000_rate_30_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/len_1000_rate_30_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_30_rep_4": {
+                    "name": "len_1000_rate_30_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/len_1000_rate_30_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_30_rep_5": {
+                    "name": "len_1000_rate_30_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/len_1000_rate_30_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_30/len_1000_rate_30_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_1000_rate_50": {
+            "name": "len_1000_rate_50",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50",
+            "seq_amount": 1000,
+            "injection_rate": 0.5,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/background.fa",
+            "replicates": {
+                "len_1000_rate_50_rep_1": {
+                    "name": "len_1000_rate_50_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/len_1000_rate_50_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_50_rep_2": {
+                    "name": "len_1000_rate_50_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/len_1000_rate_50_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_50_rep_3": {
+                    "name": "len_1000_rate_50_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/len_1000_rate_50_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_50_rep_4": {
+                    "name": "len_1000_rate_50_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/len_1000_rate_50_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_50_rep_5": {
+                    "name": "len_1000_rate_50_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/len_1000_rate_50_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_50/len_1000_rate_50_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        },
+        "len_1000_rate_70": {
+            "name": "len_1000_rate_70",
+            "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70",
+            "seq_amount": 1000,
+            "injection_rate": 0.7,
+            "n_replicates": 5,
+            "background_path": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/background.fa",
+            "replicates": {
+                "len_1000_rate_70_rep_1": {
+                    "name": "len_1000_rate_70_rep_1",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/len_1000_rate_70_rep_1.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_1/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_70_rep_2": {
+                    "name": "len_1000_rate_70_rep_2",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/len_1000_rate_70_rep_2.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_2/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_70_rep_3": {
+                    "name": "len_1000_rate_70_rep_3",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/len_1000_rate_70_rep_3.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_3/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_70_rep_4": {
+                    "name": "len_1000_rate_70_rep_4",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/len_1000_rate_70_rep_4.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_4/gimme_out/intermediate/stats.gc.txt"
+                    }
+                },
+                "len_1000_rate_70_rep_5": {
+                    "name": "len_1000_rate_70_rep_5",
+                    "dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5",
+                    "gimme_out_dir": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out",
+                    "test_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/len_1000_rate_70_rep_5.fa",
+                    "background_fasta": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/background.fa",
+                    "status": "completed_denovo",
+                    "gimme_denovo": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out/gimme.denovo.pfm",
+                    "gimme_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out/stats.gc.txt"
+                    },
+                    "all_motifs": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out/intermediate/all_motifs.pfm",
+                    "all_motifs_stats": {
+                        "custom": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out/intermediate/stats.custom.txt",
+                        "genomic": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out/intermediate/stats.genomic.txt",
+                        "gc": "/polio/oded/MotiFabEnv/presentation_run/len_1000_rate_70/len_1000_rate_70_rep_5/gimme_out/intermediate/stats.gc.txt"
+                    }
+                }
+            },
+            "status": "generated"
+        }
+    }
+}
