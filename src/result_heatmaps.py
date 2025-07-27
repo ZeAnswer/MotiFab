@@ -14,6 +14,11 @@ import matplotlib.pyplot as plt
 
 def plot_discovery_heatmaps(csv_path: str,
                             output_dir: str,
+                            seq_amounts: list,
+                            injection_rates: list,
+                            n_replicates: int,
+                            tools: list,
+                            backgrounds: list,
                             only_significant: bool = False,
                             save_heatmap: bool = True):
     """
@@ -24,19 +29,21 @@ def plot_discovery_heatmaps(csv_path: str,
     Parameters:
         csv_path: path to results CSV with fields [dataset_length, injection_rate, replicate, tool, significance (JSON), is_match].
         output_dir: directory to save the heatmap PNG.
+        seq_amounts: list of dataset lengths used in the experiment.
+        injection_rates: list of injection rates used in the experiment.
+        n_replicates: number of replicates per condition.
+        tools: list of tools used in the experiment.
+        backgrounds: list of background types used in the experiment.
         only_significant: if True, count only matches with significant stat for the background.
+        save_heatmap: if True, save the heatmap to file; otherwise display it.
     """
     # load results
     df = pd.read_csv(csv_path)
     # parse significance JSON column
     df['sig_dict'] = df['significance'].apply(lambda s: json.loads(s) if pd.notna(s) else {})
 
-    # hard-coded experiment dimensions
-    dataset_lengths = [80, 150, 500, 1000]
-    injection_rates = [0.1, 0.3, 0.5, 0.7]
-    replicates = [1, 2, 3, 4, 5]
-    tools = ['BioProspector', 'MEME', 'Homer', 'GimmeMotifs']
-    backgrounds = ['custom', 'gc', 'genomic']
+    # generate replicate list from n_replicates
+    replicates = list(range(1, n_replicates + 1))
 
     # prepare plot grid (no sharing to retain individual ticks)
     n_rows = len(tools)
@@ -56,9 +63,9 @@ def plot_discovery_heatmaps(csv_path: str,
             # initialize count matrix
             mat = pd.DataFrame(0,
                                index=injection_rates,
-                               columns=dataset_lengths)
+                               columns=seq_amounts)
             # fill counts
-            for dl in dataset_lengths:
+            for dl in seq_amounts:
                 for ir in injection_rates:
                     count = 0
                     for rep in replicates:
@@ -93,8 +100,8 @@ def plot_discovery_heatmaps(csv_path: str,
             # injection rate label on each heatmap y-axis
             ax.set_ylabel('Injection Rate', fontsize=9)
             # set tick labels at cell centers
-            ax.set_xticks(np.arange(len(dataset_lengths)) + 0.5)
-            ax.set_xticklabels(dataset_lengths, rotation=0)
+            ax.set_xticks(np.arange(len(seq_amounts)) + 0.5)
+            ax.set_xticklabels(seq_amounts, rotation=0)
             ax.set_yticks(np.arange(len(injection_rates)) + 0.5)
             ax.set_yticklabels(injection_rates, rotation=0)
 
@@ -124,50 +131,65 @@ class HeatmapGenerator:
     def __init__(self, dataset_manager: DatasetManager):
         self.dm = dataset_manager
         self.heatmaps_params = self.dm.get_heatmaps_generator_params()
-        self.parsed = self.dm.get_parsed_results()
 
     def generate(self):
         """Generate 'all' and 'significant' heatmaps based on parsed CSVs."""
         output_dir = self.heatmaps_params.get('output_dir', '')
         if output_dir and not os.path.exists(output_dir):
             os.makedirs(output_dir, exist_ok=True)
+        
+        # Extract parameters from config
+        seq_amounts = self.heatmaps_params.get('seq_amounts', [])
+        injection_rates = self.heatmaps_params.get('injection_rates', [])
+        n_replicates = self.heatmaps_params.get('n_replicates', 1)
+        tools = self.heatmaps_params.get('tools', [])
+        backgrounds = self.heatmaps_params.get('backgrounds', [])
+        parsed_results = self.heatmaps_params.get('parsed_results', {})
+        
         generated = {}
+        
         # locate all- and sig-specific CSV paths
-        csv_all = None
-        csv_sig = None
-        for fname, meta in self.parsed.items():
-            if meta.get('only_matches', False):
-                continue
-            if meta.get('only_significant', False):
-                csv_sig = meta.get('path')
-            else:
-                csv_all = meta.get('path')
+        csv_all = parsed_results.get('all', {}).get('path')
+        csv_sig = parsed_results.get('significant', {}).get('path')
+        
         # create 'all' heatmap
         if csv_all:
             plot_discovery_heatmaps(
                 csv_path=csv_all,
                 output_dir=output_dir,
+                seq_amounts=seq_amounts,
+                injection_rates=injection_rates,
+                n_replicates=n_replicates,
+                tools=tools,
+                backgrounds=backgrounds,
                 only_significant=False
             )
             out_all = os.path.join(output_dir, 'discovery_heatmaps.png')
             generated['all'] = {'path': out_all, 'only_significant': False}
+        
         # create 'sig' heatmap - prefer dedicated CSV, else filter all
         src = csv_sig or csv_all
         if src:
             plot_discovery_heatmaps(
                 csv_path=src,
                 output_dir=output_dir,
+                seq_amounts=seq_amounts,
+                injection_rates=injection_rates,
+                n_replicates=n_replicates,
+                tools=tools,
+                backgrounds=backgrounds,
                 only_significant=True
             )
             out_sig = os.path.join(output_dir, 'discovery_heatmaps_sig.png')
             generated['sig'] = {'path': out_sig, 'only_significant': True}
+        
         # update JSON config
         self.dm.update_generated_heatmap(generated)
         return generated
 
 # if __name__ == '__main__':
 #     # JSON-driven heatmap generation
-#     config_path = '/polio/oded/MotiFabEnv/presentation_run/dataset_config.json'
+#     config_path = '/polio/oded/MotiFabEnv/test_run_FOXD1/motifab_config.json'
 #     dm = DatasetManager(config_path)
 #     hg = HeatmapGenerator(dm)
 #     generated = hg.generate()

@@ -309,7 +309,7 @@ class ResultsParser:
     
 # if __name__ == "__main__":
 #     # JSON-driven parsing workflow
-#     manager = DatasetManager('/polio/oded/MotiFabEnv/presentation_run/dataset_config.json')
+#     manager = DatasetManager('/polio/oded/MotiFabEnv/test_run_FOXD1/motifab_config.json')
 #     parser = ResultsParser(manager)
 #     results = parser.run_all()
 #     print(f"Parsed results updated: {results}")

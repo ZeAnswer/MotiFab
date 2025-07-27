@@ -438,14 +438,13 @@ class DatasetManager:
         }
         return params
 
-
     def get_result_parser_params(self) -> dict:
         """Generates a params dict for the result parser based on the config."""
         result_parser_params = self.config.get('result_parser_params', {})
         params = { #TODO: Pretty sure this whole thing also needs a reformat, just doing it this way to save time for now
             "dumps": [
                 {
-                    "filename":         "all_discovered_motifs.csv",
+                    "filename":         "all_discovered_motifs.csv", #TODO these need to be in a var or const somewhere
                     "only_matches":     False,
                     "only_significant": False
                 },
@@ -463,15 +462,74 @@ class DatasetManager:
         }
         return params
 
-    
     def get_heatmaps_generator_params(self) -> dict:
-        """Generates a params dict for the heatmaps generator based on the config.
-        """
+        """Generates a params dict for the heatmaps generator based on the config."""
+        denovo_params = self.get_denovo_params()
+        dataset_generation_params = self.get_dataset_generation_params()
+        parsed_results = self.get_parsed_results()
+        
         params = {
-            "output_dir": f"{self.output_dir}/heatmaps",  # Use the output directory from the config
+            # Output directory for heatmaps
+            "output_dir": f"{self.output_dir}/heatmaps",
+            
+            # Experimental design parameters
+            "seq_amounts": dataset_generation_params.get('seq_amounts', []),
+            "injection_rates": dataset_generation_params.get('injection_rates', []),
+            "n_replicates": dataset_generation_params.get('n_replicates', 1),
+            
+            # Tools and backgrounds tested (include GimmeMotifs)
+            "tools": denovo_params.get('tools', []) + ["GimmeMotifs"],
+            "backgrounds": denovo_params.get('background_types', []),
+            
+            # Parsed CSV file paths
+            "parsed_results": {
+                "all": parsed_results.get('all_discovered_motifs.csv', {}),
+                "matched": parsed_results.get('matched_discovered_motifs.csv', {}),
+                "significant": parsed_results.get('significant_discovered_motifs.csv', {})
+            }
         }
         return params
 
+    def get_report_params(self) -> dict:
+        """
+        Return all the settings needed to generate the Markdown report in one shot.
+        """
+        denovo_params = self.get_denovo_params()
+        dataset_generation_params = self.get_dataset_generation_params()
+        match_params = self.get_match_params()
+        parsed_results = self.get_parsed_results()
+        heatmaps_params = self.get_generated_heatmap()
+    
+        return {
+            # 1. Where to write the report
+            "output_dir": os.path.join(self.get_output_dir(), "reports"),
+            "report_filename": "report.md",
+
+            # 2. Experimental design
+            "seq_amounts": dataset_generation_params.get('seq_amounts', []),
+            "injection_rates": dataset_generation_params.get('injection_rates', []),
+            "n_replicates": dataset_generation_params.get('n_replicates', 1),
+
+            # 3. Tools & backgrounds tested. must append GimmeMotifs to the tools list.
+            "tools": denovo_params.get('tools', []) + ["GimmeMotifs"],
+            "backgrounds": denovo_params.get('background_types', []),  # e.g. ["genomic", "gc", "random", "true_random"]
+
+            # 4. Success threshold (for “sweet-spot” analyses)
+            "threshold": match_params.get('min_score'),
+
+            # 5. Parsed-CSV metadata (as returned by get_parsed_results())
+            "parsed_results": {
+                "all":      parsed_results.get('all_discovered_motifs.csv', {}),
+                "matched":  parsed_results.get('matched_discovered_motifs.csv', {}),
+                "significant": parsed_results.get('significant_discovered_motifs.csv', {}),
+            },
+
+            # 6. Heatmap-image metadata (as returned by get_generated_heatmap())
+            "heatmaps": {
+                "all": {"path": heatmaps_params.get('all', {}).get('path', ""), "only_significant": False},
+                "sig": {"path": heatmaps_params.get('sig', {}).get('path', ""), "only_significant": True}
+            }
+        }
 
 
 # if __name__ == "__main__":
