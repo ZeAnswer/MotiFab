@@ -105,7 +105,7 @@ class DatasetManager:
     def get_combo_path(self, out_dir, seq_amount: int, injection_rate: float) -> str:
         """Generate a dir path for the combination based on seq_amount and injection_rate."""
         name = self.get_combo_name(seq_amount, injection_rate)
-        return os.path.join(out_dir, name)
+        return os.path.join(out_dir, "datasets", name)
 
     def get_combo(self, seq_amount: int, injection_rate: float) -> Optional[dict]:
         """Retrieve a combination entry by seq_amount and injection_rate."""

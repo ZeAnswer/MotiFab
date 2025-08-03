@@ -337,7 +337,7 @@ def generate_report(dm: DatasetManager):
     
     print(f"HTML report written to {html_path}")
 
-if __name__ == '__main__':
-    config_path = "/polio/oded/MotiFabEnv/test_run_FOXD1/motifab_config.json"
-    dm = DatasetManager(config_path)
-    generate_report(dm)
+# if __name__ == '__main__':
+#     config_path = "/polio/oded/MotiFabEnv/test_run_FOXD1/motifab_config.json"
+#     dm = DatasetManager(config_path)
+#     generate_report(dm)
