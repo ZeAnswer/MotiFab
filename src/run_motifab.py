@@ -23,6 +23,7 @@ from dataset_generator import DatasetGenerator
 from denovo_runner import DenovoRunner
 from results_parser import ResultsParser
 from result_heatmaps import HeatmapGenerator
+from report_generator import generate_report
 
 
 def main():
@@ -69,6 +70,10 @@ def main():
     print("[5/5] Generating heatmaps...")
     hg = HeatmapGenerator(dm)
     hg.generate()
+    
+    # Step 6: Final report generation
+    print("[6/6] Generating final report...")
+    generate_report(dm)
 
     print("MotiFab workflow complete.")
 

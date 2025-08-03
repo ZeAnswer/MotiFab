@@ -6,6 +6,7 @@ import numpy as np
 from dataset_manager import DatasetManager
 from sklearn.linear_model import LogisticRegression
 import markdown
+import base64
 #TODO this file might be getting big
 
 def markdown_to_html(markdown_text):
@@ -314,13 +315,16 @@ def generate_report(dm: DatasetManager):
         md.write("## Heatmaps\n\n")
         for info in heatmaps.values():
             label = "Significant Matches" if info.get("only_significant") else "All Matches"
-            rel = os.path.relpath(info["path"], os.path.dirname(report_path))
-            md.write(f"### {label}" + "\n\n")
-            md.write(f"![{label}]({rel})" + "\n\n")
+            with open(info["path"], "rb") as img_file:
+                encoded_string = base64.b64encode(img_file.read()).decode('utf-8')
+            
+            # Embed in Markdown
+            md.write(f"### {label}\n\n")
+            md.write(f"![{label}](data:image/png;base64,{encoded_string})\n\n")
 
         md.write("*End of Report*\n")
     print(f"Report written to {report_path}")
-    
+
     # Also generate HTML version
     with open(report_path, 'r') as f:
         markdown_content = f.read()
